@@ -1,6 +1,7 @@
 "use client";
 import { fetchClips } from "@/lib/sakugabooru";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 export default function Home() {
 const [clips, setClips] = useState([]);
@@ -34,12 +35,13 @@ console.log("Clips chargés:"+clips);
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-40">  {/* rien(Mobile) md:(Tablette)  lg:(Pc) */}
           {clips.map(clip=>(
+            <Link href={`/clips/${clip.id}`} key={clip.id} className="">
             <video
               key={clip.id}
               src={clip.file_url}
-              controls
               className="w-full h-auto rounded-lg hover:scale-105 transition"
               />
+            </Link>
           ))}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-40 ml-2">
