@@ -17,15 +17,23 @@ export default function ClipPage({params}) {
     }, [id]);
 
     return (
-        <main className="min-h-screen bg-gray-900 text-white p-8">
+        <main className="min-h-screen bg-gray-900 text-white p-8 flex flex-col items-center">
             {clip ?(
-                <div>
-                    <h1 className="">
-                        {clip.source} 
-                    </h1>
+                <div className="w-full max-w-3xl text-left">
+                    <h1 className="text-xl font-bold mb-4">
+                        source :{" "}
+                        <a
+                            href={clip.source}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            {clip.source}
+                        </a>
+                        </h1>
+
                     <video
                     src={clip.file_url}
-                    className="w-full h-auto rounded-lg mb-4 mt-4"
+                    className="mx-auto h-auto rounded-lg mb-4 mt-4 max-w-full "
                     controls
                     />
                     <p>{clip.tags}</p>

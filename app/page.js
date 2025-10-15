@@ -23,8 +23,11 @@ console.log("Clips chargés:"+clips);
     <main className="min-h-screen bg-gray-900 text-white p-8">
 
       {/* Header */}
+      <div>
+      
+      </div>
       <h1 className="text-4xl font-bold mb-8">
-        Welcome to Sakugaa 🎬
+        Welcome to Sakugaa 
       </h1>
       
       {/* Trending Section */}
@@ -40,29 +43,35 @@ console.log("Clips chargés:"+clips);
               key={clip.id}
               src={clip.file_url}
               className="w-full h-auto rounded-lg hover:scale-105 transition"
+              onMouseEnter={(e)=> e.currentTarget.play()}
+              onMouseLeave={(e)=> {
+                e.currentTarget.pause()
+                e.currentTarget.currentTime = 0;
+              }}
+              muted
               />
             </Link>
           ))}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-40 ml-2">
-          <div className="">
+          <div className="bg-gray-800 p-4 rounded-lg text-center hover:scale-105 transition">
             <h1>Animateur numero1</h1>
             <p>Description de animateur numero1</p>
-            <button className="">
+            <button className="bg-gray-800 p-4 rounded-lg text-center hover:scale-105 transition">
               Reseaux sociaux
             </button>
           </div>
-          <div>
+          <div className="bg-gray-800 p-4 rounded-lg text-center hover:scale-105 transition">
             <h1>Animateur numero2</h1>
             <p>Description de animateur numero2</p>
             <button className="">
               Reseaux sociaux
             </button>
           </div>
-          <div>
+          <div className="bg-gray-800 p-4 rounded-lg text-center hover:scale-105 transition">
             <h1>Animateur numero3</h1>
             <p>Description de animateur numero3</p>
-            <button className="">
+            <button >
               Reseaux sociaux
             </button>
           </div>
