@@ -33,6 +33,8 @@ export default function ClipPage({params}) {
 
                     <video
                     src={clip.file_url}
+                    loading="lazy"
+                    preload="none" //charge que les video dans l'ecran
                     className="mx-auto h-auto rounded-lg mb-4 mt-4 max-w-full "
                     controls
                     autoPlay 

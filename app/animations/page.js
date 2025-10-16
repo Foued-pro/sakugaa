@@ -11,7 +11,7 @@ export default function AnimationPage() {
     useEffect(() => {
         async function loadClips() {
             setLoading(true);  
-            const data = await fetchClips(20, page, 'animated');
+            const data = await fetchClips(10, page, 'animated');
             setClips(data);
             setLoading(false);  
         }
@@ -45,12 +45,15 @@ export default function AnimationPage() {
                             <Link href={`/clips/${clip.id}`} key={clip.id}>
                                 <video
                                     src={clip.file_url}
-                                    className="w-full h-auto rounded-lg hover:scale-105 transition cursor-pointer"
+                                    className="w-full aspect-video rounded-lg transition hover:scale-105 cursor-pointer"
                                     onMouseEnter={(e) => e.currentTarget.play()}
                                     onMouseLeave={(e) => {
                                         e.currentTarget.pause();
                                         e.currentTarget.currentTime = 0;
                                     }}
+                                    loading="lazy"
+                                    poster={clip.thumbnail}
+                                    preload="metadata" //charge seulement dimensions + durée
                                     muted
                                     loop
                                 />
