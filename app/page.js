@@ -2,6 +2,7 @@
 import { fetchClips } from "@/lib/sakugabooru";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { Navbar } from "@/components/Navbar";
 
 export default function Home() {
 const [clips, setClips] = useState([]);
@@ -10,8 +11,6 @@ useEffect(() => {
           console.log('START: Chargement des clips...');
 
         const data = await fetchClips();
-        console.log('📦 RESULT:', data);
-        console.log('📊 Nombre de clips:', data.length);
         setClips(data);
     }
     loadClips();
@@ -22,15 +21,10 @@ console.log("Clips chargés:"+clips);
   return (
     <main className="min-h-screen bg-gray-900 text-white p-8">
 
-      {/* Header */}
-      <div>
-      
-      </div>
-      <h1 className="text-4xl font-bold mb-8">
+      <h1 className="text-4xl font-bold mb-8 mt-8">
         Welcome to Sakugaa 
       </h1>
       
-      {/* Trending Section */}
       <section className="mb-12">
         <h2 className="font-bold text-3xl mb-6">
           Trending Clips

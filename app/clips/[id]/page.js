@@ -35,6 +35,10 @@ export default function ClipPage({params}) {
                     src={clip.file_url}
                     className="mx-auto h-auto rounded-lg mb-4 mt-4 max-w-full "
                     controls
+                    autoPlay 
+                    playsInline
+                    loop
+                    muted
                     />
                     <p>{clip.tags}</p>
                     <p>{clip.id}</p>

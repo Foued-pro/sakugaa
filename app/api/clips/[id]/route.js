@@ -16,6 +16,6 @@ export async function GET(request){
             'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=120'
         });
     }catch(error){
-        console.error('❌ ERREUR dans API Route:', error.message);
+        console.error('ERREUR dans API Route:', error.message);
     }
 }
