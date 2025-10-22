@@ -10,7 +10,7 @@ useEffect(() => {
     async function loadClips() {
           console.log('START: Chargement des clips...');
 
-        const data = await fetchClips();
+        const data = await fetchClips(3);
         setClips(data);
     }
     loadClips();
