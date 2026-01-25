@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { fetchClipById } from "../../../lib/sakugabooru";
+export const runtime = 'edge';
+
 import {
     Calendar,
     User,
