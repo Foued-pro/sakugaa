@@ -7,7 +7,7 @@ import type { SakugabooruPost } from '../type/sakugabooru';
 import Link from "next/link";
 import Masonry from 'react-masonry-css';
 import { motion } from "framer-motion";
-
+export const dynamic = 'force-dynamic';
 export default function AnimationPage() {
     const router = useRouter();
     const searchParams = useSearchParams();
