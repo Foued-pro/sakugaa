@@ -1,6 +1,6 @@
 "use client"
 import { useEffect, useState } from "react"
-import { fetchArtist } from "@/lib/sakugabooru";
+import { fetchArtist } from "../../lib/sakugabooru";
 
 export default function ArtistPage(){
     const [listArtist, setListArtist] = useState([]);
