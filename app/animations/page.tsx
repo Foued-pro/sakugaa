@@ -1,7 +1,9 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from 'next/navigation';
-import { fetchClips } from '@/lib/sakugabooru';
+import { fetchClips } from '../../lib/sakugabooru.js';
+import type { SakugabooruPost } from '../type/sakugabooru';
+
 import Link from "next/link";
 import Masonry from 'react-masonry-css';
 import { motion } from "framer-motion";
@@ -10,12 +12,15 @@ export default function AnimationPage() {
     const router = useRouter();
     const searchParams = useSearchParams();
 
-    const currentPage = parseInt(searchParams.get('page') || '1');
+
+    const pageParam = searchParams.get('page');
+    const currentPage = pageParam ? Math.max(1, parseInt(pageParam)) : 1;
+
     const currentSearch = searchParams.get('search') || '';
 
-    const [clips, setClips] = useState([]);
+    const [clips, setClips] = useState<SakugabooruPost[]>([]);
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
+    const [error, setError] = useState<string | null>(null);
     const [searchInput, setSearchInput] = useState('');
 
     const POPULAR_TAGS = ['fate', 'naruto', 'one_piece', 'jujutsu_kaisen', 'chainsaw_man','production_materials'];
@@ -29,11 +34,28 @@ export default function AnimationPage() {
         500: 1
     };
 
-    function updateURL(search, page) {
-        const params = new URLSearchParams();
-        if (search) params.set('search', search);
-        if (page > 1) params.set('page', page.toString());
-        const newURL = params.toString() ? `?${params.toString()}` : '';
+    function updateURL(newSearch?:string, newPage?: number): void {
+        const currentParams = new URLSearchParams(searchParams.toString());
+
+        if (newSearch !== undefined) {
+            if (newSearch) {
+                currentParams.set('search', newSearch);
+            }
+            else {
+                currentParams.delete('search');
+            }
+        }
+
+        if (newPage !== undefined) {
+            if (newPage > 1){
+                currentParams.set('page', newPage.toString());
+            }
+            else {
+                currentParams.delete('page');
+            }
+        }
+
+        const newURL = currentParams.toString() ? `?${currentParams.toString()}` : '';
         router.push(`/animations${newURL}`);
     }
 
@@ -41,11 +63,10 @@ export default function AnimationPage() {
         const query = searchInput.trim().toLowerCase();
         if (!query) return;
         updateURL(query, 1);
-        setSearchInput('');
     }
 
-    function selectTag(tag) { updateURL(tag, 1); }
-    function changePage(newPage) {
+    function selectTag(tag:string) { updateURL(tag, 1); }
+    function changePage(newPage: number) {
         updateURL(currentSearch, newPage);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -56,11 +77,12 @@ export default function AnimationPage() {
                 setLoading(true);
                 setError(null);
                 const data = await fetchClips(12, currentPage, currentSearch);
+                console.log("Premier clip:", data[0]);
+
                 setClips(data);
-            } catch (error) {
-                console.error("Erreur", error);
-                setError(true);
-            } finally {
+            }  catch (error) {
+                setError(error instanceof Error ? error.message : "Erreur inconnue");
+            }finally {
                 setLoading(false);
             }
         }
@@ -121,9 +143,7 @@ export default function AnimationPage() {
                         {clips.map((clip, index) => {
                             if (!clip.file_url) return null;
 
-                            const isVideo = clip.file_url.endsWith('.mp4') ||
-                                clip.file_url.endsWith('.webm') ||
-                                clip.file_url.endsWith('.mov');
+                            const isVideo = ['mp4', 'webm', 'mov', 'mkv'].includes(clip.file_ext);
 
                             return (
                                 <motion.div
@@ -140,7 +160,6 @@ export default function AnimationPage() {
                                             {isVideo ? (
                                                 <video
                                                     src={clip.file_url}
-                                                    /* ✅ TON SYSTÈME DE HOVER PRÉSERVÉ & OPTIMISÉ */
                                                     className="w-full h-auto object-cover block"
                                                     onMouseEnter={(e) => {
                                                         // On joue la vidéo
@@ -150,11 +169,10 @@ export default function AnimationPage() {
                                                         }
                                                     }}
                                                     onMouseLeave={(e) => {
-                                                        // On pause et on remet au début quand la souris part
                                                         e.currentTarget.pause();
                                                         e.currentTarget.currentTime = 0;
                                                     }}
-                                                    poster={clip.preview_url || clip.sample_url} // ✅ L'image s'affiche avant le survol
+                                                    poster={clip.preview_url || undefined}
                                                     muted
                                                     loop
                                                     playsInline
@@ -162,21 +180,26 @@ export default function AnimationPage() {
                                                 />
                                             ) : (
                                                 <img
-                                                    src={clip.sample_url || clip.file_url}
-                                                    alt={clip.tags}
+                                                    src={clip.preview_url}
+                                                    alt={clip.tags?.split(' ').slice(0, 3).join(', ') || 'Animation clip'}
+                                                    loading={"lazy"}
                                                     className="w-full h-auto object-cover block"
                                                 />
                                             )}
 
                                             {/* Badges sur l'image */}
-                                            {isVideo && (
+                                            {isVideo ? (
                                                 <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-md px-2 py-0.5 rounded text-[10px] font-bold text-white border border-white/10 shadow-sm pointer-events-none">
                                                     VIDEO
                                                 </div>
-                                            )}
+                                            ):(
+                                                <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-md px-2 py-0.5 rounded text-[10px] font-bold text-white border border-white/10 shadow-sm pointer-events-none">
+                                                IMAGE
+                                                </div>
+                                                )
+                                            }
                                         </div>
-
-                                        {/* Infos sous la carte (J'ai remis ton style "sous l'image" car tu aimais les infos) */}
+                                        
                                         <div className="p-3 bg-gray-900 group-hover:bg-gray-800 transition-colors">
                                             <div className="flex items-center justify-between mb-1">
                                                 <span className="text-xs font-semibold text-gray-300 truncate max-w-[70%]">

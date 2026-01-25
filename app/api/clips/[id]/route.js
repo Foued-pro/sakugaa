@@ -11,7 +11,6 @@ export async function GET(request){
             throw new Error("erreur lors de la requete HTTP:"+response.status);
         }
         const data = await response.json();
-        console.log('Renvoi du clip:',data[0])
         return NextResponse.json(data[0],{
             'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=120'
         });

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { fetchClipById } from "@/lib/sakugabooru";
+import { fetchClipById } from "../../../lib/sakugabooru";
 import {
     Calendar,
     User,

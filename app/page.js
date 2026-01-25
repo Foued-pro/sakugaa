@@ -1,5 +1,5 @@
 "use client";
-import { fetchClips } from "@/lib/sakugabooru";
+import { fetchClips } from '../lib/sakugabooru.js';
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
@@ -16,6 +16,9 @@ export default function Home() {
     }
     loadClips();
   }, []);
+
+  console.log(loading);
+  console.log(clips);
 
   return (
       <main className="min-h-screen bg-gradient-to-b from-gray-900 via-black to-gray-900 text-white">
@@ -203,30 +206,6 @@ export default function Home() {
                     </button>
                   </div>
               ))}
-            </div>
-          </section>
-
-          {/* CTA SECTION - Simplifiée */}
-          <section className="max-w-4xl mx-auto px-4 py-16">
-            <div className="bg-gray-800/50 rounded-2xl p-8 text-center border border-gray-700">
-              <h2 className="text-3xl font-bold mb-4">Explore More</h2>
-              <p className="text-gray-300 mb-8 max-w-xl mx-auto">
-                Browse thousands of clips, discover new animators, and save your favorites.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link
-                    href="/gallery"
-                    className="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition"
-                >
-                  Browse Gallery
-                </Link>
-                <Link
-                    href="/about"
-                    className="px-6 py-3 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-lg font-medium transition"
-                >
-                  Learn More
-                </Link>
-              </div>
             </div>
           </section>
         </div>
