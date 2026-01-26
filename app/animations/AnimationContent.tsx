@@ -3,10 +3,64 @@ import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from 'next/navigation';
 import { fetchClips } from '../../lib/sakugabooru.js';
 import type { SakugabooruPost } from '../type/sakugabooru';
-
+import { useInView } from '../hook/useInView';
 import Link from "next/link";
 import Masonry from 'react-masonry-css';
 import { motion } from "framer-motion";
+
+
+
+function VideoPlayer({ clip }: { clip: SakugabooruPost }) {
+    const { ref, isInView } = useInView<HTMLVideoElement>(0.5);
+    const [isMobile, setIsMobile] = useState(false);
+
+    // Détecter si on est sur mobile/tactile
+    useEffect(() => {
+        const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        setIsMobile(hasTouch);
+    }, []);
+
+    // Autoplay seulement sur mobile quand visible
+    useEffect(() => {
+        const video = ref.current;
+        if (!video || !isMobile) return;
+
+        if (isInView) {
+            video.play().catch(() => {});
+        } else {
+            video.pause();
+            video.currentTime = 0;
+        }
+    }, [isInView, isMobile]);
+
+    return (
+        <video
+            ref={ref}
+            src={clip.file_url}
+            className="w-full h-auto object-cover block"
+            poster={clip.preview_url || undefined}
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            // Hover seulement sur desktop
+            onMouseEnter={(e) => {
+                if (!isMobile) {
+                    e.currentTarget.play().catch(() => {});
+                }
+            }}
+            onMouseLeave={(e) => {
+                if (!isMobile) {
+                    e.currentTarget.pause();
+                    e.currentTarget.currentTime = 0;
+                }
+            }}
+        />
+    );
+}
+
+
+
 export default function AnimationContent() {  // ← Renommé
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -20,7 +74,7 @@ export default function AnimationContent() {  // ← Renommé
     const [clips, setClips] = useState<SakugabooruPost[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [searchInput, setSearchInput] = useState('');
+    const [searchInput, setSearchInput] = useState(currentSearch);
 
     const POPULAR_TAGS = ['fate', 'naruto', 'one_piece', 'jujutsu_kaisen', 'chainsaw_man','production_materials'];
 
@@ -88,6 +142,11 @@ export default function AnimationContent() {  // ← Renommé
         loadClips();
     }, [currentPage, currentSearch]);
 
+    useEffect(() => {
+        setSearchInput(currentSearch);
+    }, [currentSearch]);
+
+
     return (
         <div className="min-h-screen bg-black text-white">
             {/* Header Fixe */}
@@ -113,9 +172,21 @@ export default function AnimationContent() {  // ← Renommé
                         />
                         {/* Tags Rapides */}
                         <div className="mt-3 flex flex-wrap gap-2">
-                            <button onClick={() => updateURL('', 1)} className={`text-xs px-3 py-1 rounded-full transition-colors ${!currentSearch ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-400'}`}>All</button>
-                            {POPULAR_TAGS.map(tag => (
-                                <button key={tag} onClick={() => selectTag(tag)} className={`text-xs px-3 py-1 rounded-full transition-colors ${currentSearch === tag ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}>
+                            {/* Bouton "All" */}
+                            <button
+                                onClick={() => updateURL('', 1)}
+                                aria-label="Afficher tous les clips sans filtre"  // ← AJOUTE
+                                className={`text-xs px-3 py-1 rounded-full transition-colors ${!currentSearch ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-400'}`}
+                            >
+                                All
+                            </button>
+                                {POPULAR_TAGS.map(tag => (
+                                <button
+                                    key={tag}
+                                    onClick={() => selectTag(tag)}
+                                    aria-label={`Rechercher les clips avec le tag ${tag}`}  // ← AJOUTE
+                                    className={`text-xs px-3 py-1 rounded-full transition-colors ${currentSearch === tag ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}
+                                >
                                     {tag.replace('_', ' ')}
                                 </button>
                             ))}
@@ -132,7 +203,20 @@ export default function AnimationContent() {  // ← Renommé
                             <div key={i} className="aspect-video bg-gray-900 rounded-xl animate-pulse" />
                         ))}
                     </div>
-                ) : (
+                ) : error ? (
+                        <div className="flex flex-col items-center justify-center py-20">
+                            <div className="text-red-500 text-6xl mb-4">⚠️</div>
+                            <h2 className="text-xl font-bold text-white mb-2">Erreur de chargement</h2>
+                            <p className="text-gray-400 mb-4">{error}</p>
+                            <button
+                                onClick={() => window.location.reload()}
+                                className="px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-700"
+                            >
+                                Réessayer
+                            </button>
+                        </div>
+                    ) :
+                    (
                     /* GRILLE MASONRY */
                     <Masonry
                         breakpointCols={breakpointColumnsObj}
@@ -155,49 +239,30 @@ export default function AnimationContent() {  // ← Renommé
                                     <Link href={`/clips/${clip.id}`} className="block relative overflow-hidden rounded-xl bg-gray-900 border border-gray-800 hover:border-blue-500/50 transition-all hover:shadow-2xl hover:shadow-blue-900/20">
 
                                         {/* Zone Média */}
+                                        {/* Zone Média */}
                                         <div className="relative w-full">
                                             {isVideo ? (
-                                                <video
-                                                    src={clip.file_url}
-                                                    className="w-full h-auto object-cover block"
-                                                    onMouseEnter={(e) => {
-                                                        // On joue la vidéo
-                                                        const playPromise = e.currentTarget.play();
-                                                        if (playPromise !== undefined) {
-                                                            playPromise.catch(() => {});
-                                                        }
-                                                    }}
-                                                    onMouseLeave={(e) => {
-                                                        e.currentTarget.pause();
-                                                        e.currentTarget.currentTime = 0;
-                                                    }}
-                                                    poster={clip.preview_url || undefined}
-                                                    muted
-                                                    loop
-                                                    playsInline
-                                                    preload="metadata"
-                                                />
-                                            ) : (
+                                                <VideoPlayer clip={clip} />
+                                                ) : (
                                                 <img
-                                                    src={clip.preview_url}
-                                                    alt={clip.tags?.split(' ').slice(0, 3).join(', ') || 'Animation clip'}
-                                                    loading={"lazy"}
-                                                    className="w-full h-auto object-cover block"
-                                                />
-                                            )}
+                                                src={clip.preview_url}
+                                             alt={clip.tags?.split(' ').slice(0, 3).join(', ') || 'Animation clip'}
+                                             loading={"lazy"}
+                                             className="w-full h-auto object-cover block"
+                                        />
+                                        )}
 
-                                            {/* Badges sur l'image */}
-                                            {isVideo ? (
-                                                <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-md px-2 py-0.5 rounded text-[10px] font-bold text-white border border-white/10 shadow-sm pointer-events-none">
-                                                    VIDEO
-                                                </div>
-                                            ):(
-                                                <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-md px-2 py-0.5 rounded text-[10px] font-bold text-white border border-white/10 shadow-sm pointer-events-none">
-                                                    IMAGE
-                                                </div>
-                                            )
-                                            }
-                                        </div>
+                                        {/* Badges sur l'image */}
+                                        {isVideo ? (
+                                            <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-md px-2 py-0.5 rounded text-[10px] font-bold text-white border border-white/10 shadow-sm pointer-events-none">
+                                                VIDEO
+                                            </div>
+                                        ) : (
+                                            <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-md px-2 py-0.5 rounded text-[10px] font-bold text-white border border-white/10 shadow-sm pointer-events-none">
+                                                IMAGE
+                                            </div>
+                                        )}
+                                    </div>
 
                                         <div className="p-3 bg-gray-900 group-hover:bg-gray-800 transition-colors">
                                             <div className="flex items-center justify-between mb-1">
