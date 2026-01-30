@@ -24,7 +24,7 @@ const ArtistCard = ({ animator, index }: { animator: any, index: number }) => {
             catch (e) { console.error("Erreur media", animator.name); }
         };
         loadMedia();
-    }, [animator.tag]);
+    }, [animator.tag, animator.name]);
 
     return (
         <ScrollReveal delay={index * 0.1}>

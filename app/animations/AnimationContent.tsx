@@ -40,12 +40,13 @@ const VideoPlayer = memo(({ clip }: { clip: SakugabooruPost }) => {
 
     // GARBAGE COLLECTION FORCÉ
     useEffect(() => {
+        const video = videoRef.current;
+
         return () => {
-            const video = videoRef.current;
             if (video) {
                 video.pause();
-                video.removeAttribute('src'); // Coupe le lien fichier
-                video.load(); // Vide le buffer RAM
+                video.removeAttribute('src');
+                video.load();
             }
         };
     }, []);
