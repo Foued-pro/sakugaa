@@ -5,7 +5,7 @@ async function getClips() {
   try {
     const res = await fetch(
         'https://www.sakugabooru.com/post.json?limit=20&page=1&tags=production_materials',
-        { next: { revalidate: 60 } }
+        { next: { revalidate: 300 } }
     );
     if (!res.ok) return [];
     return await res.json();

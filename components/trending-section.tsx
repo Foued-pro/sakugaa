@@ -78,7 +78,7 @@ export function TrendingSection({ clips = [] }: TrendingSectionProps) {
                 <div className="flex justify-between items-end mb-12">
                     <div>
                         <span className="text-[#c4b5fd] font-bold text-xs uppercase tracking-widest">Trending Now</span>
-                        <h2 className="text-4xl font-bold mt-2 text-[#1a1a1a]"><h2>This week&apos;s top clips</h2></h2>
+                        <h2 className="text-4xl font-bold mt-2 text-[#1a1a1a]">This week&apos;s top clips</h2>
                     </div>
                     <Link href="/animations" className="group flex items-center gap-2 px-6 py-3 rounded-full border border-gray-200 bg-gray-50 text-sm font-medium text-gray-600 hover:text-[#1a1a1a] hover:border-gray-300 hover:bg-white transition-all">
                         View All <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1"/>
