@@ -13,8 +13,8 @@ export function Footer() {
                     <div className="col-span-1 lg:col-span-2">
                         <h2 className="text-2xl font-bold tracking-tight text-foreground">Sakugaa</h2>
                         <p className="mt-4 max-w-sm text-muted-foreground leading-relaxed">
-                            Une plateforme dédiée à l'art de l'animation japonaise.
-                            Découvrez, partagez et célébrez les meilleurs moments de sakuga.
+                            A platform dedicated to the art of Japanese animation.
+                            Discover, share, and celebrate the best moments of sakuga.
                         </p>
                     </div>
 
