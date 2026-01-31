@@ -4,16 +4,16 @@ import {TrendingSection} from "@/components/trending-section";
 import {FeaturedAnimators} from "@/components/featured-animators";
 
 interface HomeClientProps {
-    initialClips: any[];
+    heroClips: any[];
+    trendingClips: any[];
     animators: any[];
 }
-
-export function HomeClient({ initialClips, animators }: HomeClientProps) {
+export function HomeClient({ heroClips, trendingClips, animators }: HomeClientProps) {
     // ...
     return (
         <main>
-            <HeroSection clips={initialClips} />
-            <TrendingSection clips={initialClips} />
+            <HeroSection clips={heroClips} />
+            <TrendingSection clips={trendingClips} />
             <FeaturedAnimators animators={animators} />
         </main>
     );

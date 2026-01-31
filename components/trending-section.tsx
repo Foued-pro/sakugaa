@@ -20,11 +20,26 @@ const TrendingCard = ({ clip, index }: { clip: any, index: number }) => {
     const bg = previewColors[index % previewColors.length];
 
     useEffect(() => {
-        if (videoRef.current) {
-            if (isHovered) videoRef.current.play().catch(() => {});
-            else { videoRef.current.pause(); videoRef.current.currentTime = 0; }
+        const video = videoRef.current;
+        if (!video) return;
+
+        if (isHovered) {
+            video.play().catch(() => {});
+        } else {
+            video.pause();
+            video.currentTime = 0;
         }
     }, [isHovered]);
+    useEffect(() => {
+        const video = videoRef.current;
+        return () => {
+            if (video) {
+                video.pause();
+                video.removeAttribute('src');
+                video.load();
+            }
+        };
+    }, []);
 
     const title = clip.tags?.split(' ').slice(0, 3).join(' ') || "Animation Clip";
     const artist = clip.tags?.split(' ').find((t: string) => t.includes('animator')) || "Unknown Artist";
@@ -39,9 +54,6 @@ const TrendingCard = ({ clip, index }: { clip: any, index: number }) => {
                 onClick={() => playClick()}
             >
                 <div className={`aspect-video rounded-2xl overflow-hidden relative shrink-0 ${bg}`}>
-
-                    {/* BOUTON FLÈCHE : DÉPLACÉ EN BAS À DROITE */}
-                    {/* J'ai retiré le 'bg-black/10' qui faisait un carré moche quand ce n'est pas centré */}
                     <div className="absolute bottom-3 right-3 z-20 opacity-0 group-hover:opacity-100 transition-all duration-300">
                         <div className="w-12 h-12 rounded-full bg-white/30 backdrop-blur-md flex items-center justify-center transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 border border-white/50 shadow-lg">
                             <ArrowRight className="w-5 h-5 text-white" />
@@ -49,7 +61,8 @@ const TrendingCard = ({ clip, index }: { clip: any, index: number }) => {
                     </div>
 
                     {isVideo ? (
-                        <video ref={videoRef} src={clip.file_url} className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" muted loop playsInline />
+                        <video ref={videoRef} src={clip.file_url} className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" muted loop playsInline preload="none"
+                               poster={clip.preview_url} />
                     ) : (
                         <img src={clip.sample_url || clip.file_url} alt={title} className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" />
                     )}

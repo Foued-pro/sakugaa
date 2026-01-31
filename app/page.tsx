@@ -11,15 +11,25 @@ const animators = [
 
 async function getClips() {
   try {
-    const res = await fetch(
-        'https://www.sakugabooru.com/post.json?limit=20&page=1&tags=production_materials',
+    // Pour le Hero marquee
+    const heroRes = await fetch(
+        'https://www.sakugabooru.com/post.json?limit=10&page=1&tags=production_materials',
         { next: { revalidate: 60 } }
     );
-    if (!res.ok) return [];
-    return await res.json();
+
+    // Pour Trending (les mieux notés)
+    const trendingRes = await fetch(
+        'https://www.sakugabooru.com/post.json?limit=6&page=1&tags=order:score',
+        { next: { revalidate: 60 } }
+    );
+
+    const heroClips = heroRes.ok ? await heroRes.json() : [];
+    const trendingClips = trendingRes.ok ? await trendingRes.json() : [];
+
+    return { heroClips, trendingClips };
   } catch (error) {
     console.error("Erreur fetch clips:", error);
-    return [];
+    return { heroClips: [], trendingClips: [] };
   }
 }
 
@@ -59,11 +69,10 @@ async function getAnimatorsWithMedia() {
 }
 
 export default async function Home() {
-  // Fetch en parallèle
-  const [clips, animatorsWithMedia] = await Promise.all([
+  const [{ heroClips, trendingClips }, animatorsWithMedia] = await Promise.all([
     getClips(),
     getAnimatorsWithMedia()
   ]);
 
-  return <HomeClient initialClips={clips} animators={animatorsWithMedia} />;
+  return <HomeClient heroClips={heroClips} trendingClips={trendingClips} animators={animatorsWithMedia} />;
 }
