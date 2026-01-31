@@ -19,7 +19,7 @@ export function HomeClient({ heroClips, trendingClips, animators }: HomeClientPr
         // Affiche le loading pendant minimum 1.5 secondes pour le style
         const timer = setTimeout(() => {
             setShowLoading(false);
-        }, 1500);
+        }, 1000);
 
         return () => clearTimeout(timer);
     }, []);

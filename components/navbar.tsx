@@ -7,7 +7,7 @@ import { useState } from "react";
 import Link from "next/link";
 
 const navLinks = [
-  { name: "Clips", href: "/clips" },
+  { name: "Clips", href: "/animations" },
   { name: "Artists", href: "/artists" },
   { name: "Trending", href: "#trending" },
   { name: "Community", href: "/community" },
@@ -36,11 +36,16 @@ export function Navbar() {
       >
         <div className="mx-auto flex max-w-[1500px] items-center justify-between px-6 md:px-12 py-6">
 
+          {/* Logo mis à jour */}
           <Link href="/" className="group relative z-10">
-            <div className="flex items-baseline gap-1.5">
-              <span className="w-3 h-3 bg-[#1a1a1a] rounded-sm group-hover:bg-[#c4b5fd] group-hover:rotate-45 transition-all duration-300" />
-              <span className="text-2xl font-bold tracking-tighter text-[#1a1a1a]">
-                  Sakugaa
+            <div className="flex items-center gap-2">
+              <motion.span
+                  className="w-3 h-3 bg-[#c4b5fd] rounded-sm"
+                  whileHover={{ rotate: 180, scale: 1.1 }}
+                  transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+              />
+              <span className="text-2xl font-bold tracking-tight text-[#1a1a1a]">
+                Sakug<span className="font-serif italic text-[#c4b5fd]">aa</span>
               </span>
             </div>
           </Link>
@@ -65,9 +70,8 @@ export function Navbar() {
             ))}
           </div>
 
-          {/* Actions Desktop : 2 Boutons */}
+          {/* Actions Desktop */}
           <div className="hidden items-center gap-4 md:flex">
-            {/* Bouton 1 : Log in (Style Outline/Clair) */}
             <Button
                 variant="ghost"
                 className="rounded-full px-6 py-6 text-base font-medium text-gray-600 hover:text-black hover:bg-gray-100 border border-transparent hover:border-gray-200 transition-all"
@@ -76,7 +80,6 @@ export function Navbar() {
               <Link href="/login">Log in</Link>
             </Button>
 
-            {/* Bouton 2 : Join Free (Style Solid/Noir) */}
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Button className="rounded-full bg-[#1a1a1a] px-8 py-6 text-base text-white hover:bg-black/80 shadow-sm" asChild>
                 <Link href="/register">Join Free</Link>
@@ -107,7 +110,6 @@ export function Navbar() {
                   ))}
                   <hr className="border-gray-100"/>
 
-                  {/* Boutons Mobile empilés */}
                   <div className="flex flex-col gap-3">
                     <Button variant="outline" className="w-full rounded-full py-6 text-lg border-gray-200 text-gray-700 hover:bg-gray-50" asChild>
                       <Link href="/login">Log in</Link>
