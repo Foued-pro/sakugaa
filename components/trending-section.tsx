@@ -1,16 +1,11 @@
 "use client";
-
-import { useState, useRef, useEffect } from "react";
-import { ArrowRight, Star } from "lucide-react";
+import {useEffect, useRef, useState} from "react";
+import {useSoundEffect} from "@/lib/sounds";
+import {ArrowRight, Star} from "lucide-react";
 import Link from "next/link";
-import { useSoundEffect } from "@/lib/sounds";
-import { ScrollReveal } from "@/components/scroll-reveal";
-
-interface TrendingSectionProps {
-    clips: any[];
-}
 
 const previewColors = ["bg-[#ede9fe]", "bg-[#fce7f3]", "bg-[#ede9fe]", "bg-[#fce7f3]", "bg-[#ede9fe]", "bg-[#fce7f3]"];
+
 
 const TrendingCard = ({ clip, index }: { clip: any, index: number }) => {
     const videoRef = useRef<HTMLVideoElement>(null);
@@ -19,17 +14,7 @@ const TrendingCard = ({ clip, index }: { clip: any, index: number }) => {
     const isVideo = clip.file_url?.match(/\.(mp4|webm|mov)$/);
     const bg = previewColors[index % previewColors.length];
 
-    useEffect(() => {
-        const video = videoRef.current;
-        if (!video) return;
-
-        if (isHovered) {
-            video.play().catch(() => {});
-        } else {
-            video.pause();
-            video.currentTime = 0;
-        }
-    }, [isHovered]);
+    // Cleanup mémoire
     useEffect(() => {
         const video = videoRef.current;
         return () => {
@@ -41,9 +26,24 @@ const TrendingCard = ({ clip, index }: { clip: any, index: number }) => {
         };
     }, []);
 
+    // Play/Pause au hover
+    useEffect(() => {
+        const video = videoRef.current;
+        if (!video) return;
+
+        if (isHovered) {
+            video.play().catch(() => {});
+        } else {
+            video.pause();
+            video.currentTime = 0;
+        }
+    }, [isHovered]);
+
     const title = clip.tags?.split(' ').slice(0, 3).join(' ') || "Animation Clip";
     const artist = clip.tags?.split(' ').find((t: string) => t.includes('animator')) || "Unknown Artist";
     const score = clip.score || 0;
+
+    const secureFileUrl = clip.file_url?.replace('http:', 'https:');
 
     return (
         <Link href={`/clips/${clip.id}`} className="block h-full">
@@ -54,17 +54,31 @@ const TrendingCard = ({ clip, index }: { clip: any, index: number }) => {
                 onClick={() => playClick()}
             >
                 <div className={`aspect-video rounded-2xl overflow-hidden relative shrink-0 ${bg}`}>
-                    <div className="absolute bottom-3 right-3 z-20 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                    <div className="absolute bottom-3 right-3 z-20 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none">
                         <div className="w-12 h-12 rounded-full bg-white/30 backdrop-blur-md flex items-center justify-center transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 border border-white/50 shadow-lg">
                             <ArrowRight className="w-5 h-5 text-white" />
                         </div>
                     </div>
 
                     {isVideo ? (
-                        <video ref={videoRef} src={clip.file_url} className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" muted loop playsInline preload="none"
-                               poster={clip.preview_url} />
+                        <video
+                            ref={videoRef}
+                            src={secureFileUrl}
+                            // @ts-expect-error: referrerPolicy non standard en React types
+                            referrerPolicy="no-referrer"
+                            className="w-full h-full object-cover"
+                            muted
+                            loop
+                            playsInline
+                            preload="metadata" // ← Preview HD automatique
+                        />
                     ) : (
-                        <img src={clip.sample_url || clip.file_url} alt={title} className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" />
+                        <img
+                            src={clip.sample_url || clip.file_url}
+                            alt={title}
+                            referrerPolicy="no-referrer"
+                            className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                        />
                     )}
                 </div>
 
@@ -84,6 +98,10 @@ const TrendingCard = ({ clip, index }: { clip: any, index: number }) => {
     );
 };
 
+interface TrendingSectionProps {
+    clips: any[];
+}
+
 export function TrendingSection({ clips = [] }: TrendingSectionProps) {
     return (
         <section className="py-24 bg-white border-t border-gray-100">
@@ -100,9 +118,7 @@ export function TrendingSection({ clips = [] }: TrendingSectionProps) {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {clips.map((clip, i) => (
-                        <ScrollReveal key={clip.id} direction="up" delay={i * 0.1}>
-                            <TrendingCard clip={clip} index={i} />
-                        </ScrollReveal>
+                        <TrendingCard key={clip.id} clip={clip} index={i} />
                     ))}
                 </div>
             </div>

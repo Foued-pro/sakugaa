@@ -1,22 +1,52 @@
 export function LoadingSkeleton() {
     return (
-        <div className="min-h-screen bg-[#fafaf9] dark:bg-black">
-            {/* Header Skeleton */}
-            <div className="pt-24 pb-8 px-6 max-w-[1600px] mx-auto">
-                <div className="h-10 w-48 bg-gray-200 dark:bg-gray-800 rounded-lg animate-pulse mb-6" />
-                <div className="h-14 w-full max-w-2xl bg-gray-200 dark:bg-gray-800 rounded-full animate-pulse mb-4" />
-                <div className="flex gap-2">
-                    {[...Array(5)].map((_, i) => (
-                        <div key={i} className="h-8 w-20 bg-gray-200 dark:bg-gray-800 rounded-full animate-pulse" />
-                    ))}
+        <div className="min-h-screen bg-white">
+            {/* Header Skeleton - Style identique à AnimationContent */}
+            <div className="relative pt-32 pb-16 px-6 md:px-12 border-b border-gray-100 bg-white/80 backdrop-blur-xl">
+                <div className="max-w-[1600px] mx-auto">
+                    <div className="flex flex-col lg:flex-row items-start lg:items-end justify-between gap-8 mb-10">
+                        <div className="w-full lg:w-auto">
+                            {/* Badge skeleton */}
+                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gray-100 mb-4">
+                                <div className="w-3 h-3 bg-gray-300 rounded-full animate-pulse" />
+                                <div className="h-3 w-24 bg-gray-300 rounded animate-pulse" />
+                            </div>
+                            {/* Title skeleton */}
+                            <div className="space-y-3">
+                                <div className="h-12 w-64 bg-gray-200 rounded-lg animate-pulse" />
+                                <div className="h-12 w-48 bg-gray-100 rounded-lg animate-pulse" />
+                            </div>
+                        </div>
+
+                        {/* Search bar skeleton */}
+                        <div className="w-full lg:w-auto lg:min-w-[500px]">
+                            <div className="h-16 bg-gray-50 rounded-full animate-pulse shadow-sm" />
+                        </div>
+                    </div>
+
+                    {/* Tags skeleton */}
+                    <div className="flex flex-wrap gap-3 items-center">
+                        <div className="h-4 w-16 bg-gray-300 rounded animate-pulse" />
+                        {[...Array(5)].map((_, i) => (
+                            <div key={i} className="h-10 w-32 bg-gray-100 border border-gray-200 rounded-full animate-pulse" />
+                        ))}
+                    </div>
                 </div>
             </div>
 
-            {/* Grid Skeleton */}
-            <div className="px-6 pb-20 max-w-[1600px] mx-auto">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                    {[...Array(8)].map((_, i) => (
-                        <div key={i} className="aspect-[16/9] bg-gray-200 dark:bg-gray-900 rounded-2xl animate-pulse" />
+            {/* Grid Skeleton - Masonry style */}
+            <div className="px-6 md:px-12 py-12 max-w-[1600px] mx-auto">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+                    {[...Array(6)].map((_, i) => (
+                        <div key={i} className="bg-white border border-gray-100 rounded-3xl p-3 shadow-sm animate-pulse">
+                            {/* Video placeholder */}
+                            <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl mb-4" />
+                            {/* Info placeholder */}
+                            <div className="px-2 space-y-2">
+                                <div className="h-5 bg-gray-200 rounded w-3/4" />
+                                <div className="h-4 bg-gray-100 rounded w-1/2" />
+                            </div>
+                        </div>
                     ))}
                 </div>
             </div>

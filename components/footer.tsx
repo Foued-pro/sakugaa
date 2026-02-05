@@ -33,7 +33,7 @@ export function Footer() {
                         <h3 className="font-semibold text-foreground">Connect</h3>
                         <div className="mt-4 flex gap-4">
                             <a
-                                href="https://www.linkedin.com/in/ton-profil"
+                                href="https://www.linkedin.com/in/foued-attar/"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="group flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card transition-colors hover:border-[#c4b5fd] hover:bg-[#c4b5fd]/10"
@@ -41,7 +41,7 @@ export function Footer() {
                                 <Linkedin className="h-5 w-5 text-muted-foreground group-hover:text-[#c4b5fd]" />
                             </a>
                             <a
-                                href="https://github.com/ton-profil"
+                                href="https://github.com/Foued-pro/"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="group flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card transition-colors hover:border-[#c4b5fd] hover:bg-[#c4b5fd]/10"

@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 
-
 export const runtime = 'edge';
 
 export async function GET(request) {
@@ -9,23 +8,27 @@ export async function GET(request) {
         const limit = searchParams.get('limit') || 12;
         const page = searchParams.get('page') || 1;
         const tags = searchParams.get('tags') || 'animated';
-        const url = `https://sakugabooru.com/post.json?limit=${limit}&page=${page}&tags=${tags}`;
+
+        const url = `https://www.sakugabooru.com/post.json?limit=${limit}&page=${page}&tags=${tags}`;
 
         const response = await fetch(url);
 
         if (!response.ok) {
             throw new Error(`Erreur HTTP: ${response.status}`);
         }
-        const data = await response.json();
-                console.log('API ROUTE: Renvoi de', data.length, 'clips');
 
-        return NextResponse.json(data,{
-            'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=120'
+        const data = await response.json();
+        console.log('API ROUTE: Renvoi de', data.length, 'clips');
+
+        return NextResponse.json(data, {
+            headers: {
+                'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=120'
+            }
         });
-    }catch (error) {
+    } catch (error) {
         console.error('ERREUR dans API Route:', error.message);
         return NextResponse.json(
-            { error: 'Erreur lors de la récupération des clips' }, 
+            { error: 'Erreur lors de la récupération des clips' },
             { status: 500 }
         );
     }
