@@ -45,7 +45,7 @@ const VideoPlayer = memo(({ clip }: { clip: SakugabooruPost }) => {
 
     const secureFileUrl = clip.file_url?.replace('http:', 'https:');
 
-    // Cleanup
+    // Cleanup au unmount
     useEffect(() => {
         const videoElement = videoRef.current;
         return () => {
@@ -57,10 +57,10 @@ const VideoPlayer = memo(({ clip }: { clip: SakugabooruPost }) => {
         };
     }, []);
 
-    // Play/Pause
+    // Play/Pause (UN SEUL useEffect, pas deux !)
     useEffect(() => {
         const video = videoRef.current;
-        if (!video) return;
+        if (!video || !isInView) return;
 
         if (isHovered) {
             video.play().catch(() => {});
@@ -68,21 +68,7 @@ const VideoPlayer = memo(({ clip }: { clip: SakugabooruPost }) => {
             video.pause();
             video.currentTime = 0;
         }
-    }, [isHovered]);
-
-
-    // Gestion Play/Pause
-    useEffect(() => {
-        const video = videoRef.current;
-        if (!video) return;
-
-        if (isHovered) {
-            video.play().catch(() => {});
-        } else {
-            video.pause();
-            video.currentTime = 0;
-        }
-    }, [isHovered]);
+    }, [isHovered, isInView]);
 
     return (
         <div
@@ -91,7 +77,6 @@ const VideoPlayer = memo(({ clip }: { clip: SakugabooruPost }) => {
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
-            {/* La vidéo génère sa propre preview HD avec preload */}
             {isInView && (
                 <video
                     ref={videoRef}
@@ -102,11 +87,10 @@ const VideoPlayer = memo(({ clip }: { clip: SakugabooruPost }) => {
                     muted
                     loop
                     playsInline
-                    preload="metadata" // ← Charge la première frame en HD
+                    preload="metadata"
                 />
             )}
 
-            {/* UI overlay */}
             <div className="absolute bottom-3 right-3 z-20 opacity-0 group-hover/video:opacity-100 transition-all duration-300 pointer-events-none">
                 <div className="w-10 h-10 rounded-full bg-white/30 backdrop-blur-md flex items-center justify-center transform translate-y-4 group-hover/video:translate-y-0 transition-all duration-300 border border-white/50 shadow-lg">
                     <ArrowRight className="w-5 h-5 text-white" />
