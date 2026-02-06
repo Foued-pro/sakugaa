@@ -15,6 +15,8 @@ import {
     Star
 } from "lucide-react";
 
+export const runtime = 'edge';
+
 export default function ClipPage() {
     const router = useRouter();
     const { id } = useParams();
