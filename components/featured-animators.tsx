@@ -22,7 +22,6 @@ interface FeaturedAnimatorsProps {
 const ArtistCard = ({ animator, index }: { animator: Animator, index: number }) => {
     const [isHovered, setIsHovered] = useState(false);
 
-    // Plus besoin de useEffect ni de fetch !
 
     return (
         <ScrollReveal delay={index * 0.1}>
