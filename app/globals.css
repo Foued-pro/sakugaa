@@ -82,3 +82,7 @@ html {
 .animate-marquee:hover {
   animation-play-state: paused;
 }
+
+button, a {
+  cursor: pointer;
+}
