@@ -11,20 +11,41 @@ const animators = [
 
 async function getClips() {
   try {
-    // Pour le Hero marquee
     const heroRes = await fetch(
-        'https://www.sakugabooru.com/post.json?limit=10&page=1&tags=production_materials',
+        'https://www.sakugabooru.com/post.json?limit=10&page=1&tags=order:score',
         { next: { revalidate: 60 } }
     );
 
-    // Pour Trending (les mieux notés)
+    // Top clips de la semaine
+    const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+        .toISOString().split('T')[0];
+
     const trendingRes = await fetch(
-        'https://www.sakugabooru.com/post.json?limit=6&page=1&tags=order:score',
-        { next: { revalidate: 60 } }
+        `https://www.sakugabooru.com/post.json?limit=20&page=1&tags=order:score+date:>=${weekAgo}+production_materials`,
+        { next: { revalidate: 300 } }
     );
+
+    let trendingClips = trendingRes.ok ? await trendingRes.json() : [];
+
+// Garder que les vidéos
+    trendingClips = trendingClips
+        .filter((clip: any) => ['mp4', 'webm'].includes(clip.file_ext))
+        .slice(0, 6);
 
     const heroClips = heroRes.ok ? await heroRes.json() : [];
-    const trendingClips = trendingRes.ok ? await trendingRes.json() : [];
+
+    // Fallback : si pas assez de clips cette semaine, élargir à 30 jours
+    if (trendingClips.length < 3) {
+      const monthAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+          .toISOString().split('T')[0];
+
+      const fallbackRes = await fetch(
+          `https://www.sakugabooru.com/post.json?limit=6&page=1&tags=order:score+date:>=${monthAgo}`,
+          { next: { revalidate: 300 } }
+      );
+
+      trendingClips = fallbackRes.ok ? await fallbackRes.json() : trendingClips;
+    }
 
     return { heroClips, trendingClips };
   } catch (error) {
@@ -34,14 +55,13 @@ async function getClips() {
 }
 
 async function getAnimatorsWithMedia() {
-  // Fetch tous les artistes en parallèle
   const results = await Promise.all(
       animators.map(async (animator) => {
         try {
           const query = `${animator.tag} -production_materials order:score`;
           const res = await fetch(
               `https://www.sakugabooru.com/post.json?limit=1&page=1&tags=${encodeURIComponent(query)}`,
-              { next: { revalidate: 300 } } // Cache 5 min pour les artistes
+              { next: { revalidate: 300 } }
           );
 
           if (!res.ok) return { ...animator, media: null };

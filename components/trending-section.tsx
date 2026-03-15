@@ -1,43 +1,18 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useSoundEffect } from "@/lib/sounds";
 import { ArrowRight, Star, Crown } from "lucide-react";
 import Link from "next/link";
 
-// --- VIDEO HOOK (shared logic) ---
-function useVideoHover() {
-    const videoRef = useRef<HTMLVideoElement>(null);
-    const [isHovered, setIsHovered] = useState(false);
-
-    useEffect(() => {
-        const video = videoRef.current;
-        return () => {
-            if (video) {
-                video.pause();
-                video.removeAttribute('src');
-                video.load();
-            }
-        };
-    }, []);
-
-    useEffect(() => {
-        const video = videoRef.current;
-        if (!video) return;
-        if (isHovered) {
-            video.play().catch(() => {});
-        } else {
-            video.pause();
-            video.currentTime = 0;
-        }
-    }, [isHovered]);
-
-    return { videoRef, isHovered, setIsHovered };
+// Fallback poster (preview_url = toujours un .jpg)
+function getPoster(clip: any) {
+    return clip.preview_url?.replace('http:', 'https:');
 }
 
-// --- FEATURED CARD (#1 clip, big) ---
+// --- FEATURED CARD (#1, autoplay comme featured-animators) ---
 function FeaturedCard({ clip }: { clip: any }) {
-    const { videoRef, setIsHovered } = useVideoHover();
     const { playClick } = useSoundEffect();
+    const containerRef = useRef<HTMLDivElement>(null);
     const isVideo = clip.file_url?.match(/\.(mp4|webm|mov)$/);
     const secureFileUrl = clip.file_url?.replace('http:', 'https:');
 
@@ -47,9 +22,8 @@ function FeaturedCard({ clip }: { clip: any }) {
     return (
         <Link href={`/clips/${clip.id}`} className="block">
             <div
+                ref={containerRef}
                 className="group relative bg-white border border-gray-100 rounded-3xl p-3 shadow-sm hover:shadow-2xl transition-all duration-300"
-                onMouseEnter={() => setIsHovered(true)}
-                onMouseLeave={() => setIsHovered(false)}
                 onClick={() => playClick()}
             >
                 {/* Badge #1 */}
@@ -58,7 +32,7 @@ function FeaturedCard({ clip }: { clip: any }) {
                     #1 This Week
                 </div>
 
-                <div className="aspect-[21/9] rounded-2xl overflow-hidden relative bg-[#ede9fe]">
+                <div className="aspect-video md:aspect-[21/9] rounded-2xl overflow-hidden relative bg-[#ede9fe]">
                     {/* Arrow hover */}
                     <div className="absolute bottom-4 right-4 z-20 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none">
                         <div className="w-14 h-14 rounded-full bg-white/30 backdrop-blur-md flex items-center justify-center transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 border border-white/50 shadow-lg">
@@ -66,20 +40,20 @@ function FeaturedCard({ clip }: { clip: any }) {
                         </div>
                     </div>
 
-                    {/* Gradient overlay bottom */}
+                    {/* Gradient overlay */}
                     <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/40 to-transparent z-10 pointer-events-none" />
 
                     {isVideo ? (
                         <video
-                            ref={videoRef}
                             src={secureFileUrl}
+                            poster={getPoster(clip)}
                             // @ts-expect-error: referrerPolicy non standard
                             referrerPolicy="no-referrer"
-                            className="w-full h-full object-cover"
+                            className="absolute inset-0 w-full h-full object-cover z-[1]"
+                            autoPlay
                             muted
                             loop
                             playsInline
-                            preload="metadata"
                         />
                     ) : (
                         <img
@@ -91,10 +65,10 @@ function FeaturedCard({ clip }: { clip: any }) {
                     )}
 
                     {/* Info overlay */}
-                    <div className="absolute bottom-0 left-0 right-0 z-20 p-5 md:p-6">
+                    <div className="absolute bottom-0 left-0 right-0 z-20 p-4 md:p-6">
                         <div className="flex items-end justify-between gap-4">
                             <div>
-                                <h3 className="font-bold text-white text-xl md:text-2xl leading-tight capitalize line-clamp-1 drop-shadow-lg">
+                                <h3 className="font-bold text-white text-lg md:text-2xl leading-tight capitalize line-clamp-1 drop-shadow-lg">
                                     {title}
                                 </h3>
                                 <p className="text-white/70 text-sm mt-1 capitalize">
@@ -113,11 +87,10 @@ function FeaturedCard({ clip }: { clip: any }) {
     );
 }
 
-// --- SMALL CARD (clips #2-6) ---
+// --- SMALL CARD (#2-6, même pattern que le hero marquee) ---
 const previewColors = ["bg-[#fce7f3]", "bg-[#ede9fe]", "bg-[#fce7f3]", "bg-[#ede9fe]", "bg-[#fce7f3]"];
 
 function SmallCard({ clip, rank }: { clip: any; rank: number }) {
-    const { videoRef, setIsHovered } = useVideoHover();
     const { playClick } = useSoundEffect();
     const isVideo = clip.file_url?.match(/\.(mp4|webm|mov)$/);
     const secureFileUrl = clip.file_url?.replace('http:', 'https:');
@@ -129,10 +102,16 @@ function SmallCard({ clip, rank }: { clip: any; rank: number }) {
     return (
         <Link href={`/clips/${clip.id}`} className="block h-full">
             <div
-                className="group h-full bg-white border border-gray-100 rounded-3xl p-3 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col"
-                onMouseEnter={() => setIsHovered(true)}
-                onMouseLeave={() => setIsHovered(false)}
+                className="group relative h-full bg-white border border-gray-100 rounded-3xl p-3 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col"
                 onClick={() => playClick()}
+                onMouseEnter={(e) => {
+                    const video = e.currentTarget.querySelector('video');
+                    if (video) video.play().catch(() => {});
+                }}
+                onMouseLeave={(e) => {
+                    const video = e.currentTarget.querySelector('video');
+                    if (video) { video.pause(); video.currentTime = 0; }
+                }}
             >
                 {/* Rank badge */}
                 <div className="absolute top-5 left-5 z-30">
@@ -150,11 +129,11 @@ function SmallCard({ clip, rank }: { clip: any; rank: number }) {
 
                     {isVideo ? (
                         <video
-                            ref={videoRef}
                             src={secureFileUrl}
+                            poster={getPoster(clip)}
                             // @ts-expect-error: referrerPolicy non standard
                             referrerPolicy="no-referrer"
-                            className="w-full h-full object-cover"
+                            className="absolute inset-0 w-full h-full object-cover z-[1]"
                             muted
                             loop
                             playsInline
@@ -207,12 +186,12 @@ export function TrendingSection({ clips = [] }: TrendingSectionProps) {
         <section id="trending" className="py-24 bg-white border-t border-gray-100">
             <div className="max-w-[1500px] mx-auto px-6 md:px-12">
                 {/* Header */}
-                <div className="flex justify-between items-end mb-12">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-12">
                     <div>
                         <span className="text-[#c4b5fd] font-bold text-xs uppercase tracking-widest">
                             Trending Now
                         </span>
-                        <h2 className="text-4xl font-bold mt-2 text-[#1a1a1a]">
+                        <h2 className="text-3xl md:text-4xl font-bold mt-2 text-[#1a1a1a]">
                             This week&apos;s top clips
                         </h2>
                     </div>
