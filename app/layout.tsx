@@ -21,10 +21,31 @@ const instrumentSerif = Instrument_Serif({
 });
 
 export const metadata: Metadata = {
-    title: "Sakugaa - Animation Excellence",
-    description: "Discover the finest animation moments.",
+    title: {
+        default: "Sakugaa — Discover the finest animation moments",
+        template: "%s | Sakugaa",
+    },
+    description: "Explore thousands of curated anime sakuga clips, discover talented animators, and celebrate the art of animation. A modern interface for Sakugabooru.",
+    keywords: ["sakuga", "anime", "animation", "sakugabooru", "animators", "clips", "japanese animation"],
+    metadataBase: new URL("https://sakugaa.com"),
+    openGraph: {
+        title: "Sakugaa — Discover the finest animation moments",
+        description: "Explore thousands of curated anime sakuga clips and celebrate the art of animation.",
+        url: "https://sakugaa.com",
+        siteName: "Sakugaa",
+        type: "website",
+        locale: "en_US",
+    },
+    twitter: {
+        card: "summary_large_image",
+        title: "Sakugaa",
+        description: "The modern sakuga platform",
+    },
+    robots: {
+        index: true,
+        follow: true,
+    },
 };
-
 export default function RootLayout({
                                        children,
                                    }: Readonly<{
