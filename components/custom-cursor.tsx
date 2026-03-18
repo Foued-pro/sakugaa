@@ -15,15 +15,12 @@ export function CustomCursor() {
     const springConfig = { damping: 25, stiffness: 300 }
     const cursorXSpring = useSpring(cursorX, springConfig)
     const cursorYSpring = useSpring(cursorY, springConfig)
-
-    // Trail dots
     const trailLength = 8
     const trailRefs = useRef<{ x: number; y: number }[]>(
         Array(trailLength).fill({ x: -100, y: -100 })
     )
 
     useEffect(() => {
-        // Hide default cursor
         document.body.style.cursor = "none"
 
         const moveCursor = (e: MouseEvent) => {
@@ -31,7 +28,6 @@ export function CustomCursor() {
             cursorY.set(e.clientY)
             setIsVisible(true)
 
-            // Update trail
             trailRefs.current = [
                 { x: e.clientX, y: e.clientY },
                 ...trailRefs.current.slice(0, trailLength - 1)
@@ -81,15 +77,12 @@ export function CustomCursor() {
             document.removeEventListener("mouseenter", handleMouseEnter)
         }
     }, [cursorX, cursorY])
-
-    // Don't render on touch devices
     if (typeof window !== "undefined" && "ontouchstart" in window) {
         return null
     }
 
     return (
         <>
-            {/* Trail dots */}
             {trailRefs.current.map((_, index) => (
                 <motion.div
                     key={index}
@@ -106,8 +99,6 @@ export function CustomCursor() {
                     transition={{ delay: index * 0.02 }}
                 />
             ))}
-
-            {/* Main cursor dot */}
             <motion.div
                 className="pointer-events-none fixed left-0 top-0 z-[9999] rounded-full bg-foreground mix-blend-difference"
                 style={{
@@ -123,8 +114,6 @@ export function CustomCursor() {
                 }}
                 transition={{ type: "spring", damping: 20, stiffness: 300 }}
             />
-
-            {/* Cursor ring */}
             <motion.div
                 className="pointer-events-none fixed left-0 top-0 z-[9998] rounded-full border-2 border-[#c4b5fd]"
                 style={{
@@ -141,8 +130,6 @@ export function CustomCursor() {
                 }}
                 transition={{ type: "spring", damping: 15, stiffness: 200 }}
             />
-
-            {/* Cursor text */}
             {cursorText && (
                 <motion.div
                     className="pointer-events-none fixed left-0 top-0 z-[10000] flex items-center justify-center text-xs font-medium text-background"

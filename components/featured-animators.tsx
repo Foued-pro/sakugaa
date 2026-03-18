@@ -37,7 +37,6 @@ const ArtistCard = ({ animator, index }: { animator: Animator, index: number }) 
                     onMouseEnter={() => setIsHovered(true)}
                     onMouseLeave={() => setIsHovered(false)}
                 >
-                    {/* GAUCHE : Média */}
                     <div className="w-full md:w-1/2 h-[220px] md:h-full relative overflow-hidden bg-gray-100">
                         {animator.media ? (
                             <motion.div
@@ -59,7 +58,6 @@ const ArtistCard = ({ animator, index }: { animator: Animator, index: number }) 
                         <div className="absolute inset-0 bg-gradient-to-r from-black/10 to-transparent pointer-events-none" />
                     </div>
 
-                    {/* DROITE : Infos */}
                     <div className="w-full md:w-1/2 p-6 md:p-8 flex flex-col justify-center relative bg-white">
                         <div className="mb-auto">
                             <motion.span

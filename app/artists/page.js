@@ -41,13 +41,10 @@ export default function ArtistPage(){
                             key={artist.id} 
                             className="border border-gray-300 rounded-lg p-6 shadow-sm hover:shadow-md mb-5 hover:scale-105 transition-transform bg-white"
                         >
-                            {/* Nom et ID en tête */}
                             <div className="flex justify-between items-start mb-3">
                                 <h2 className="text-xl font-bold text-gray-800">{artist.name}</h2>
                                 <span className="text-gray-400 text-sm">#{artist.id}</span>
                             </div>
-                            
-                            {/* Informations principales */}
                             <div className="space-y-2">
                                 <p className="text-gray-600">
                                     <span className="font-medium">Alias:</span> {artist.alias || 'Aucun'}
@@ -60,7 +57,6 @@ export default function ArtistPage(){
                                 )}
                             </div>
 
-                            {/* Liens - en bas avec séparation */}
                             {artist.urls && artist.urls.length > 0 && (
                                 <div className="mt-4 pt-4 border-t border-gray-200">
                                     <p className="text-sm font-medium text-gray-700 mb-2">Liens:</p>

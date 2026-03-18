@@ -55,7 +55,6 @@ export default function AuthPage() {
 
     return (
         <div className="min-h-[100dvh] bg-[#FAFAF9] flex flex-col relative overflow-hidden">
-            {/* Background blobs — plus petits sur mobile pour la perf */}
             <motion.div
                 animate={{ scale: [1, 1.15, 1], x: [0, 25, 0], y: [0, -15, 0] }}
                 transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
@@ -67,7 +66,6 @@ export default function AuthPage() {
                 className="absolute bottom-[5%] -right-[20%] md:right-[5%] w-[280px] md:w-[450px] h-[280px] md:h-[450px] bg-[#fce7f3] rounded-full blur-[100px] md:blur-[140px] opacity-40 pointer-events-none"
             />
 
-            {/* Dot grid — desktop only */}
             <div
                 className="absolute inset-0 opacity-[0.015] pointer-events-none hidden md:block"
                 style={{
@@ -76,10 +74,6 @@ export default function AuthPage() {
                 }}
             />
 
-            {/*
-        Mobile  → bottom-sheet : card collé en bas, fond visible en haut
-        Desktop → centré classique
-      */}
             <div className="flex-1 flex flex-col md:items-center md:justify-center px-0 md:px-4">
                 <motion.div
                     initial={{ opacity: 0, y: 40 }}
@@ -89,9 +83,7 @@ export default function AuthPage() {
                 >
                     <div className="relative bg-white/80 md:bg-white/70 backdrop-blur-2xl rounded-t-[28px] md:rounded-3xl border-t border-x md:border border-white/80 md:shadow-[0_8px_64px_rgba(196,181,253,0.12)] px-5 sm:px-6 pt-7 pb-[max(1.5rem,env(safe-area-inset-bottom))] md:p-10">
 
-                        {/* Drag indicator mobile */}
                         <div className="w-10 h-1 rounded-full bg-gray-300/60 mx-auto mb-5 md:hidden" />
-
                         <AnimatePresence mode="wait">
                             <motion.div
                                 key={mode}
@@ -100,7 +92,6 @@ export default function AuthPage() {
                                 animate="visible"
                                 exit={{ opacity: 0, transition: { duration: 0.15 } }}
                             >
-                                {/* Branding */}
                                 <motion.div variants={itemVariants} className="flex items-center justify-center gap-2 mb-5 md:mb-8">
                                     <motion.div
                                         animate={{ rotate: 360 }}
@@ -112,7 +103,6 @@ export default function AuthPage() {
                   </span>
                                 </motion.div>
 
-                                {/* Heading */}
                                 <motion.div variants={itemVariants} className="text-center mb-5 md:mb-8">
                                     <h1 className="text-[22px] md:text-2xl font-bold text-[#1a1a1a] tracking-tight mb-1">
                                         {isLogin ? "Welcome back" : "Create an account"}
@@ -122,7 +112,6 @@ export default function AuthPage() {
                                     </p>
                                 </motion.div>
 
-                                {/* Social — touch targets 48px mobile */}
                                 <motion.div variants={itemVariants} className="grid grid-cols-3 gap-2.5 md:gap-3 mb-5 md:mb-6">
                                     {socialProviders.map((provider) => (
                                         <button
@@ -135,7 +124,6 @@ export default function AuthPage() {
                                     ))}
                                 </motion.div>
 
-                                {/* Divider */}
                                 <motion.div variants={itemVariants} className="flex items-center gap-3 md:gap-4 mb-5 md:mb-6">
                                     <div className="flex-1 h-px bg-gray-200/80" />
                                     <span className="text-[10px] md:text-[11px] uppercase tracking-[0.12em] md:tracking-[0.15em] text-[#bbb] font-medium whitespace-nowrap">
@@ -144,7 +132,6 @@ export default function AuthPage() {
                                     <div className="flex-1 h-px bg-gray-200/80" />
                                 </motion.div>
 
-                                {/* Fields — h-12 + text-[16px] sur mobile = pas de zoom iOS */}
                                 <div className="space-y-2.5 md:space-y-3">
                                     {!isLogin && (
                                         <motion.div variants={itemVariants}>
@@ -208,7 +195,6 @@ export default function AuthPage() {
                                     )}
                                 </div>
 
-                                {/* Submit — gros touch target */}
                                 <motion.div variants={itemVariants} className="mt-5 md:mt-6">
                                     <motion.button
                                         whileTap={{ scale: 0.97 }}
@@ -221,7 +207,6 @@ export default function AuthPage() {
                                     </motion.button>
                                 </motion.div>
 
-                                {/* Toggle */}
                                 <motion.p variants={itemVariants} className="text-center text-[13px] md:text-sm text-[#999] mt-5 md:mt-6">
                                     {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
                                     <button
@@ -232,7 +217,6 @@ export default function AuthPage() {
                                     </button>
                                 </motion.p>
 
-                                {/* Terms — mobile only (inside card) */}
                                 <motion.p variants={itemVariants} className="text-center text-[11px] text-[#ccc] mt-4 md:hidden">
                                     By continuing, you agree to our{" "}
                                     <a href="#" className="underline">Terms</a> &{" "}
@@ -242,7 +226,6 @@ export default function AuthPage() {
                         </AnimatePresence>
                     </div>
 
-                    {/* Terms — desktop only (below card) */}
                     <p className="hidden md:block text-center text-[11px] text-[#ccc] mt-6">
                         By continuing, you agree to our{" "}
                         <a href="#" className="underline hover:text-[#999] transition-colors">Terms</a> &{" "}

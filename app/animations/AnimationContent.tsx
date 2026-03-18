@@ -10,8 +10,6 @@ import Masonry from 'react-masonry-css';
 import { motion } from "framer-motion";
 import { Search, Sparkles, Filter, ArrowRight, ArrowLeft, Star, X } from "lucide-react";
 
-// --- CONSTANTES GLOBALES (OPTIMISATION PERFS) ---
-// Sorties du composant pour éviter la ré-allocation et le re-layout Masonry à chaque render
 const MASONRY_BREAKPOINTS = {
     default: 3,
     1536: 3,
@@ -37,7 +35,6 @@ const CARD_TRANSITION = {
     ease: [0.22, 1, 0.36, 1] as const
 };
 
-// --- VIDEO PLAYER COMPONENT ---
 const VideoPlayer = memo(({ clip }: { clip: SakugabooruPost }) => {
     const { ref: containerRef, isInView } = useInView<HTMLDivElement>(0.2);
     const videoRef = useRef<HTMLVideoElement>(null);
@@ -45,7 +42,6 @@ const VideoPlayer = memo(({ clip }: { clip: SakugabooruPost }) => {
 
     const secureFileUrl = clip.file_url?.replace('http:', 'https:');
 
-    // Cleanup au unmount
     useEffect(() => {
         const videoElement = videoRef.current;
         return () => {
@@ -57,7 +53,6 @@ const VideoPlayer = memo(({ clip }: { clip: SakugabooruPost }) => {
         };
     }, []);
 
-    // Play/Pause (UN SEUL useEffect, pas deux !)
     useEffect(() => {
         const video = videoRef.current;
         if (!video || !isInView) return;
@@ -81,7 +76,6 @@ const VideoPlayer = memo(({ clip }: { clip: SakugabooruPost }) => {
                 <video
                     ref={videoRef}
                     src={secureFileUrl}
-                    // @ts-expect-error: referrerPolicy non standard en React types
                     referrerPolicy="no-referrer"
                     className="absolute inset-0 w-full h-full object-cover z-0"
                     muted
@@ -101,15 +95,12 @@ const VideoPlayer = memo(({ clip }: { clip: SakugabooruPost }) => {
 });
 VideoPlayer.displayName = "VideoPlayer";
 
-// --- CLIP CARD COMPONENT ---
 const ClipCard = memo(({ clip }: { clip: SakugabooruPost }) => {
     if (!clip.file_url) return null;
-
     const isVideo = ['mp4', 'webm', 'mov', 'mkv'].includes(clip.file_ext);
     const artistName = clip.tags?.split(' ').find(t => t.includes('animator')) || clip.author || 'Unknown';
     const title = clip.tags?.split(' ').slice(0, 3).join(' ').replace(/_/g, ' ') || "Animation Clip";
 
-    // FIX FALLBACK IMAGE : Priorité Sample -> Preview -> File (si image) -> null
     const rawImageUrl = clip.sample_url || clip.preview_url || (!isVideo ? clip.file_url : null);
     const secureImageUrl = rawImageUrl?.replace('http:', 'https:');
 
@@ -169,12 +160,10 @@ const ClipCard = memo(({ clip }: { clip: SakugabooruPost }) => {
 });
 ClipCard.displayName = "ClipCard";
 
-// --- MAIN PAGE COMPONENT ---
 export default function AnimationContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
 
-    // OPTIMISATION : useMemo pour éviter le re-calcul à chaque petit render
     const pageParam = searchParams.get('page');
     const currentPage = useMemo(() => pageParam ? Math.max(1, parseInt(pageParam)) : 1, [pageParam]);
     const currentSearch = useMemo(() => searchParams.get('search') || '', [searchParams]);
@@ -184,7 +173,6 @@ export default function AnimationContent() {
     const [error, setError] = useState<string | null>(null);
     const [searchInput, setSearchInput] = useState(currentSearch);
 
-    // Fonction de mise à jour de l'URL
     const updateURL = useCallback((newSearch?: string, newPage?: number) => {
         const currentParams = new URLSearchParams(searchParams.toString());
 
@@ -200,17 +188,14 @@ export default function AnimationContent() {
     }, [searchParams, router]);
 
     const handleSearch = useCallback(() => {
-        // Utilisation de searchInput (state local) pour éviter les incohérences
         if (!searchInput.trim() && !currentSearch) return;
         updateURL(searchInput.trim(), 1);
     }, [searchInput, currentSearch, updateURL]);
 
-    // Reset des clips uniquement si la recherche change vraiment
     useEffect(() => {
         setClips([]);
     }, [currentSearch]);
 
-    // FETCHING : Pattern AbortController (Moderne React 18+)
     useEffect(() => {
         const abortController = new AbortController();
 
@@ -218,8 +203,6 @@ export default function AnimationContent() {
             try {
                 setLoading(true);
                 setError(null);
-
-                // On passe le signal si fetchClips le supporte, sinon on gère l'annulation juste après
                 const data = await fetchClips(15, currentPage, currentSearch, { signal: abortController.signal });
 
                 if (!abortController.signal.aborted) {
@@ -230,7 +213,6 @@ export default function AnimationContent() {
                     }
                 }
             } catch (error: unknown) {
-                // On ignore les erreurs dues à l'annulation
                 if (error instanceof Error && error.name === 'AbortError') return;
 
                 if (!abortController.signal.aborted) {
@@ -249,14 +231,12 @@ export default function AnimationContent() {
         return () => abortController.abort();
     }, [currentPage, currentSearch]);
 
-    // Sync input si l'URL change (ex: navigation arrière)
     useEffect(() => {
         setSearchInput(currentSearch);
     }, [currentSearch]);
 
     return (
         <div className="min-h-screen bg-white text-[#1a1a1a]">
-            {/* HEADER */}
             <div className="relative pt-32 pb-16 px-6 md:px-12 border-b border-gray-100 bg-white/80 backdrop-blur-xl transition-all duration-300">
                 <div className="max-w-[1600px] mx-auto">
                     <div className="flex flex-col lg:flex-row items-start lg:items-end justify-between gap-8 mb-10">
@@ -275,7 +255,6 @@ export default function AnimationContent() {
                             </h1>
                         </div>
 
-                        {/* Search Bar */}
                         <div className="w-full lg:w-auto lg:min-w-[500px]">
                             <div className="relative group">
                                 <div className="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none">
@@ -301,7 +280,6 @@ export default function AnimationContent() {
                         </div>
                     </div>
 
-                    {/* Tags */}
                     <div className="flex flex-wrap gap-3 items-center">
                         <span className="text-sm font-bold text-gray-400 mr-2">Trending:</span>
                         {POPULAR_TAGS.map(tag => (
@@ -324,7 +302,6 @@ export default function AnimationContent() {
                 </div>
             </div>
 
-            {/* CONTENU GRILLE */}
             <div className="px-6 md:px-12 py-12 max-w-[1600px] mx-auto min-h-[60vh]">
                 {loading ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
@@ -349,10 +326,6 @@ export default function AnimationContent() {
                     </div>
                 ) : (
                     <>
-                        {/* OPTIMISATION MASONRY:
-                           On passe l'objet constant MASONRY_BREAKPOINTS défini hors du composant
-                           pour éviter le recalcul du layout à chaque render.
-                        */}
                         <Masonry
                             breakpointCols={MASONRY_BREAKPOINTS}
                             className="flex w-auto -ml-8"

@@ -7,8 +7,6 @@ export function CommunityCTA() {
     return (
         <section className="py-24 relative overflow-hidden">
             <div className="max-w-[1500px] mx-auto px-6 md:px-12">
-
-                {/* Grande Carte Blanche */}
                 <motion.div
                     initial={{ opacity: 0, y: 40 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -16,13 +14,10 @@ export function CommunityCTA() {
                     transition={{ duration: 0.8, ease: "easeOut" }}
                     className="relative rounded-[3rem] bg-white border border-gray-100 shadow-2xl shadow-gray-200/50 overflow-hidden px-6 py-16 md:px-20 md:py-24 text-center md:text-left"
                 >
-                    {/* Dégradés d'arrière-plan */}
                     <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/3 w-[600px] h-[600px] bg-[#ede9fe]/60 blur-[100px] rounded-full pointer-events-none" />
                     <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/3 w-[500px] h-[500px] bg-[#fce7f3]/60 blur-[100px] rounded-full pointer-events-none" />
 
                     <div className="relative z-10 flex flex-col xl:flex-row items-center justify-between gap-12">
-
-                        {/* Texte */}
                         <div className="max-w-2xl">
                             <motion.div
                                 initial={{ opacity: 0, y: 20 }}
@@ -45,27 +40,21 @@ export function CommunityCTA() {
                                 Sakugaa is a community-driven project. If you know a legendary cut that is missing from our database, submit it now.
                             </p>
                         </div>
-
-                        {/* BOUTONS D'ACTION (Maintenant cliquables) */}
                         <div className="flex flex-col sm:flex-row gap-4 shrink-0">
-
-                            {/* Bouton 1 : Submit (Lien vers /submit) */}
                             <Link href="/submit">
                                 <motion.div
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
-                                    className="cursor-pointer" // Force le curseur main
+                                    className="cursor-pointer"
                                 >
                                     <Button className="h-16 px-10 rounded-full bg-[#1a1a1a] text-white text-lg font-bold hover:bg-black flex items-center gap-2 shadow-lg shadow-black/10 pointer-events-none">
-                                        {/* pointer-events-none sur le bouton pour laisser le Link gérer le clic */}
                                         <Upload className="w-5 h-5" />
                                         Submit a Clip
                                     </Button>
                                 </motion.div>
                             </Link>
 
-                            {/* Bouton 2 : Request (Lien vers /contact ou mailto) */}
-                            <Link href="mailto:contact@sakugaa.com">
+                            <Link href="mailto:attar.foued@gmail.com">
                                 <motion.div
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
@@ -80,8 +69,6 @@ export function CommunityCTA() {
 
                         </div>
                     </div>
-
-                    {/* Décoration Visuelle */}
                     <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.02] pointer-events-none" />
 
                 </motion.div>

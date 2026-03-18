@@ -9,7 +9,6 @@ export function Footer() {
             <div className="mx-auto max-w-7xl px-6">
                 <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
 
-                    {/* Brand & Description */}
                     <div className="col-span-1 lg:col-span-2">
                         <h2 className="text-2xl font-bold tracking-tight text-foreground">Sakugaa</h2>
                         <p className="mt-4 max-w-sm text-muted-foreground leading-relaxed">
@@ -18,7 +17,6 @@ export function Footer() {
                         </p>
                     </div>
 
-                    {/* Navigation Rapide */}
                     <div>
                         <h3 className="font-semibold text-foreground">Navigation</h3>
                         <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
@@ -28,7 +26,6 @@ export function Footer() {
                         </ul>
                     </div>
 
-                    {/* Contact / Portfolio */}
                     <div>
                         <h3 className="font-semibold text-foreground">Connect</h3>
                         <div className="mt-4 flex gap-4">
@@ -58,7 +55,6 @@ export function Footer() {
                     </div>
                 </div>
 
-                {/* Bottom Bar */}
                 <div className="mt-16 border-t border-border pt-8 flex flex-col items-center justify-between gap-4 md:flex-row">
                     <p className="text-sm text-muted-foreground">
                         © {new Date().getFullYear()} Sakugaa. All rights reserved.

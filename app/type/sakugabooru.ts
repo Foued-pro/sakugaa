@@ -1,9 +1,9 @@
 export interface SakugabooruPost {
     id: number;
     file_url: string;
-    poster_url?: string; // ← CHANGE ÇA (au lieu de preview_url_hd)
+    poster_url?: string;
     preview_url: string;
-    preview_url_original?: string; // ← ET ÇA (optionnel)
+    preview_url_original?: string;
     file_ext: string;
     width: number;
     height: number;

@@ -17,9 +17,7 @@ export function useInView<T extends HTMLElement = HTMLElement>(threshold = 0.5) 
             },
             { threshold }
         );
-
         observer.observe(element);
-
         return () => observer.disconnect();
     }, [threshold]);
 

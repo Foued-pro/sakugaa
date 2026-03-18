@@ -97,7 +97,6 @@ export default function ClipPage() {
 
     return (
         <main className="min-h-screen bg-white">
-            {/* Header avec back button - Ajusté sticky sous la navbar */}
             <div className="sticky top-20 z-40 bg-white/80 backdrop-blur-xl border-b border-gray-100">
                 <div className="max-w-[1600px] mx-auto px-6 md:px-12 py-6">
                     <button
@@ -112,10 +111,7 @@ export default function ClipPage() {
 
             <div className="max-w-[1600px] mx-auto px-6 md:px-12 py-12">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-
-                    {/* MAIN CONTENT - Colonne principale (2/3) */}
                     <div className="lg:col-span-2 space-y-8">
-                        {/* Vidéo/Image principale */}
                         <div className="bg-white border border-gray-100 rounded-3xl overflow-hidden shadow-lg">
                             <div className="w-full bg-gradient-to-br from-gray-50 to-gray-100 flex justify-center items-center min-h-[400px] lg:min-h-[600px] p-6">
                                 {isVideo ? (
@@ -134,8 +130,6 @@ export default function ClipPage() {
                                     />
                                 )}
                             </div>
-
-                            {/* Actions bar */}
                             <div className="bg-white p-6 border-t border-gray-100 flex flex-wrap justify-between items-center gap-4">
                                 <div className="flex items-center gap-6">
                                     <div className="flex items-center gap-2">
@@ -169,8 +163,6 @@ export default function ClipPage() {
                                 </button>
                             </div>
                         </div>
-
-                        {/* Tags section (mobile/desktop) */}
                         <div className="bg-white border border-gray-100 rounded-3xl p-8 shadow-sm">
                             <div className="flex items-center gap-3 mb-6">
                                 <Tag size={20} className="text-[#c4b5fd]" />
@@ -193,10 +185,7 @@ export default function ClipPage() {
                             </div>
                         </div>
                     </div>
-
-                    {/* SIDEBAR - Infos (1/3) */}
                     <aside className="lg:col-span-1 space-y-6">
-                        {/* Détails du post - Ajusté sticky top-40 pour correspondre au nouveau header */}
                         <div className="bg-white border border-gray-100 rounded-3xl p-8 shadow-sm lg:sticky lg:top-40">
                             <h2 className="text-xl font-bold mb-6 text-[#1a1a1a] pb-4 border-b border-gray-100">
                                 Clip Details

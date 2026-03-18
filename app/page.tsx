@@ -16,7 +16,6 @@ async function getClips() {
         { next: { revalidate: 60 } }
     );
 
-    // Top clips de la semaine
     const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
         .toISOString().split('T')[0];
 
@@ -27,14 +26,12 @@ async function getClips() {
 
     let trendingClips = trendingRes.ok ? await trendingRes.json() : [];
 
-// Garder que les vidéos
     trendingClips = trendingClips
         .filter((clip: any) => ['mp4', 'webm'].includes(clip.file_ext))
         .slice(0, 6);
 
     const heroClips = heroRes.ok ? await heroRes.json() : [];
 
-    // Fallback : si pas assez de clips cette semaine, élargir à 30 jours
     if (trendingClips.length < 3) {
       const monthAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
           .toISOString().split('T')[0];
