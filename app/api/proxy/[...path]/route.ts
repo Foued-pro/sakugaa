@@ -2,19 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const runtime = 'edge';
 
-/**
- * Proxy + cache pour les assets sakugabooru (previews, samples).
- * /api/proxy/preview/abc123.jpg → sakugabooru.com/data/preview/abc123.jpg
- * /api/proxy/sample/abc123.jpg → sakugabooru.com/data/sample/abc123.jpg
- */
 export async function GET(
     request: NextRequest,
-    { params }: { params: { path: string[] } }
+    context: { params: Promise<{ path: string[] }> }
 ) {
-    const { path } = await params;
+    const { path } = await context.params;
     const imagePath = path.join('/');
 
-    // Whitelist: seulement preview/ et sample/
     if (!imagePath.startsWith('preview/') && !imagePath.startsWith('sample/')) {
         return NextResponse.json({ error: 'Invalid path' }, { status: 400 });
     }
@@ -33,9 +27,8 @@ export async function GET(
         }
 
         const contentType = response.headers.get('content-type') || 'image/jpeg';
-        const body = response.body;
 
-        return new NextResponse(body, {
+        return new NextResponse(response.body, {
             status: 200,
             headers: {
                 'Content-Type': contentType,
