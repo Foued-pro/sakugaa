@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { fetchClipById } from "../../../lib/sakugabooru";
+import { proxyUrl } from "../../../lib/proxy";
 import {
     Calendar,
     User,
@@ -117,6 +118,7 @@ export default function ClipPage() {
                                 {isVideo ? (
                                     <video
                                         src={clip.file_url?.replace('http:', 'https:')}
+                                        poster={proxyUrl(clip.preview_url || clip.sample_url)}
                                         controls
                                         autoPlay
                                         loop
@@ -124,7 +126,7 @@ export default function ClipPage() {
                                     />
                                 ) : (
                                     <img
-                                        src={(clip.sample_url || clip.file_url)?.replace('http:', 'https:')}
+                                        src={proxyUrl(clip.sample_url || clip.file_url)}
                                         alt={`Sakuga ID ${clip.id}`}
                                         className="max-w-full max-h-[80vh] object-contain rounded-2xl shadow-2xl"
                                     />

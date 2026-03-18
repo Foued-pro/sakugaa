@@ -5,6 +5,7 @@ import { ArrowRight, Sparkles, Video } from "lucide-react";
 import Link from "next/link";
 import { ScrollReveal } from "@/components/scroll-reveal";
 import { motion } from "framer-motion";
+import { proxyUrl } from "@/lib/proxy";
 
 interface Animator {
     id: string;
@@ -12,7 +13,7 @@ interface Animator {
     name: string;
     style: string;
     count: number;
-    media: { url: string; isVideo: boolean } | null;
+    media: { url: string; previewUrl?: string; isVideo: boolean } | null;
 }
 
 interface FeaturedAnimatorsProps {
@@ -45,9 +46,9 @@ const ArtistCard = ({ animator, index }: { animator: Animator, index: number }) 
                                 transition={{ duration: 0.6, ease: "easeOut" }}
                             >
                                 {animator.media.isVideo ? (
-                                    <video src={animator.media.url} className="w-full h-full object-cover" autoPlay muted loop playsInline />
+                                    <video src={animator.media.url?.replace('http:', 'https:')} poster={proxyUrl(animator.media.previewUrl)} className="w-full h-full object-cover" autoPlay muted loop playsInline />
                                 ) : (
-                                    <img src={animator.media.url} alt={animator.name} className="w-full h-full object-cover" />
+                                    <img src={proxyUrl(animator.media.url)} alt={animator.name} className="w-full h-full object-cover" />
                                 )}
                             </motion.div>
                         ) : (

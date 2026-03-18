@@ -1,12 +1,9 @@
 "use client";
 import { useEffect, useRef } from "react";
 import { useSoundEffect } from "@/lib/sounds";
+import { getPosterUrl, getImageUrl } from "@/lib/proxy";
 import { ArrowRight, Star } from "lucide-react";
 import Link from "next/link";
-
-function getPoster(clip: any) {
-    return clip.preview_url?.replace('http:', 'https:');
-}
 
 const previewColors = ["bg-[#ede9fe]", "bg-[#fce7f3]", "bg-[#ede9fe]", "bg-[#fce7f3]", "bg-[#ede9fe]", "bg-[#fce7f3]"];
 
@@ -81,9 +78,7 @@ function TrendingCard({ clip, index }: { clip: any; index: number }) {
                     {isVideo ? (
                         <video
                             src={secureFileUrl}
-                            poster={getPoster(clip)}
-                            // @ts-expect-error: referrerPolicy non standard
-                            referrerPolicy="no-referrer"
+                            poster={getPosterUrl(clip)}
                             className="absolute inset-0 w-full h-full object-cover"
                             muted
                             loop
@@ -92,9 +87,9 @@ function TrendingCard({ clip, index }: { clip: any; index: number }) {
                         />
                     ) : (
                         <img
-                            src={clip.sample_url || clip.file_url}
+                            src={getImageUrl(clip, false)}
                             alt={title}
-                            referrerPolicy="no-referrer"
+                            loading="lazy"
                             className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                         />
                     )}

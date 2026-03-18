@@ -4,6 +4,7 @@ import { motion, Variants } from "framer-motion";
 import { ArrowRight, Play } from "lucide-react";
 import Link from "next/link";
 import { MorphingBlob } from "@/components/morphing-shapes";
+import { proxyUrl, getPosterUrl } from "@/lib/proxy";
 
 const prepareMarquee = (clips: any[]) => {
     const validClips = clips.filter(c => c.file_url || c.sample_url);
@@ -125,13 +126,16 @@ export function HeroSection({ clips = [] }: HeroSectionProps) {
                                     {isVideo ? (
                                         <video
                                             src={clip.file_url}
+                                            poster={getPosterUrl(clip)}
                                             className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity duration-200"
                                             muted loop playsInline
+                                            preload="none"
                                         />
                                     ) : (
                                         <img
-                                            src={clip.sample_url || clip.file_url}
+                                            src={proxyUrl(clip.sample_url || clip.file_url)}
                                             alt={clip.tags}
+                                            loading="lazy"
                                             className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
                                         />
                                     )}

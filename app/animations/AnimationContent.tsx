@@ -9,6 +9,7 @@ import Link from "next/link";
 import Masonry from 'react-masonry-css';
 import { motion } from "framer-motion";
 import { Search, Sparkles, Filter, ArrowRight, ArrowLeft, Star, X } from "lucide-react";
+import { proxyUrl, getPosterUrl, getImageUrl } from "@/lib/proxy";
 
 const MASONRY_BREAKPOINTS = {
     default: 3,
@@ -65,6 +66,8 @@ const VideoPlayer = memo(({ clip }: { clip: SakugabooruPost }) => {
         }
     }, [isHovered, isInView]);
 
+    const posterUrl = getPosterUrl(clip);
+
     return (
         <div
             ref={containerRef}
@@ -72,12 +75,18 @@ const VideoPlayer = memo(({ clip }: { clip: SakugabooruPost }) => {
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
+            {/* Poster image visible immédiatement, avant que la vidéo charge */}
+            <img
+                src={posterUrl}
+                alt=""
+                className="absolute inset-0 w-full h-full object-cover z-0"
+            />
             {isInView && (
                 <video
                     ref={videoRef}
                     src={secureFileUrl}
-                    referrerPolicy="no-referrer"
-                    className="absolute inset-0 w-full h-full object-cover z-0"
+                    poster={posterUrl}
+                    className="absolute inset-0 w-full h-full object-cover z-[1]"
                     muted
                     loop
                     playsInline
@@ -102,7 +111,7 @@ const ClipCard = memo(({ clip }: { clip: SakugabooruPost }) => {
     const title = clip.tags?.split(' ').slice(0, 3).join(' ').replace(/_/g, ' ') || "Animation Clip";
 
     const rawImageUrl = clip.sample_url || clip.preview_url || (!isVideo ? clip.file_url : null);
-    const secureImageUrl = rawImageUrl?.replace('http:', 'https:');
+    const secureImageUrl = rawImageUrl ? proxyUrl(rawImageUrl) : '';
 
     return (
         <motion.div
@@ -123,7 +132,6 @@ const ClipCard = memo(({ clip }: { clip: SakugabooruPost }) => {
                                 <img
                                     src={secureImageUrl || ''}
                                     alt={title}
-                                    referrerPolicy="no-referrer"
                                     loading="lazy"
                                     className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                                 />
