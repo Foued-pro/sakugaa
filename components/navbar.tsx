@@ -9,7 +9,6 @@ import Link from "next/link";
 const navLinks = [
   { name: "Clips", href: "/animations" },
   { name: "Artists", href: "/artists" },
-  { name: "Trending", href: "#trending" },
   { name: "Community", href: "/community" },
 ]
 
@@ -82,7 +81,7 @@ export function Navbar() {
 
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Button className="rounded-full bg-[#1a1a1a] px-8 py-6 text-base text-white hover:bg-black/80 shadow-sm" asChild>
-                <Link href="/register">Join Free</Link>
+                <Link href="/login">Join Free</Link>
               </Button>
             </motion.div>
           </div>
@@ -116,7 +115,7 @@ export function Navbar() {
                     </Button>
 
                     <Button className="w-full rounded-full bg-[#1a1a1a] py-6 text-lg text-white" asChild>
-                      <Link href="/register">Join Free</Link>
+                      <Link href="/login">Join Free</Link>
                     </Button>
                   </div>
                 </div>
