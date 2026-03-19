@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     keywords: ["sakuga", "anime", "animation", "sakugabooru", "animators", "clips", "japanese animation"],
     metadataBase: new URL("https://sakugaa.com"),
     openGraph: {
-        title: "Sakugaa — Discover the finest animation moments",
+        title: "Sakugaa —  Discover the finest animation moments",
         description: "Explore thousands of curated anime sakuga clips and celebrate the art of animation.",
         url: "https://sakugaa.com",
         siteName: "Sakugaa",
