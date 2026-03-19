@@ -40,8 +40,14 @@ const VideoPlayer = memo(({ clip }: { clip: SakugabooruPost }) => {
     const { ref: containerRef, isInView } = useInView<HTMLDivElement>(0.2);
     const videoRef = useRef<HTMLVideoElement>(null);
     const [isHovered, setIsHovered] = useState(false);
+    const [isTouchDevice, setIsTouchDevice] = useState(false);
 
     const secureFileUrl = clip.file_url?.replace('http:', 'https:');
+
+    // Detect touch device
+    useEffect(() => {
+        setIsTouchDevice(window.matchMedia('(hover: none)').matches);
+    }, []);
 
     useEffect(() => {
         const videoElement = videoRef.current;
@@ -54,7 +60,9 @@ const VideoPlayer = memo(({ clip }: { clip: SakugabooruPost }) => {
         };
     }, []);
 
+    // Desktop: hover to play
     useEffect(() => {
+        if (isTouchDevice) return;
         const video = videoRef.current;
         if (!video || !isInView) return;
 
@@ -64,7 +72,30 @@ const VideoPlayer = memo(({ clip }: { clip: SakugabooruPost }) => {
             video.pause();
             video.currentTime = 0;
         }
-    }, [isHovered, isInView]);
+    }, [isHovered, isInView, isTouchDevice]);
+
+    // Mobile: autoplay when visible in viewport
+    useEffect(() => {
+        if (!isTouchDevice || !isInView) return;
+        const video = videoRef.current;
+        if (!video) return;
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                const entry = entries[0];
+                if (!entry) return;
+                if (entry.isIntersecting) {
+                    video.play().catch(() => {});
+                } else {
+                    video.pause();
+                }
+            },
+            { threshold: 0.5 }
+        );
+
+        observer.observe(video);
+        return () => observer.disconnect();
+    }, [isTouchDevice, isInView]);
 
     const posterUrl = getPosterUrl(clip);
 
