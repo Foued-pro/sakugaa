@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { motion, Variants } from "framer-motion";
 import { ArrowRight, Play } from "lucide-react";
 import Link from "next/link";
@@ -32,8 +33,90 @@ const itemVariants: Variants = {
     },
 };
 
+/** Clip card with autoplay on mobile (IntersectionObserver) + hover on desktop */
+function MarqueeClip({ clip, index }: { clip: any; index: number }) {
+    const cardRef = useRef<HTMLDivElement>(null);
+    const isVideo = clip.file_url?.match(/\.(mp4|webm|mov)$/);
+
+    useEffect(() => {
+        const card = cardRef.current;
+        if (!card) return;
+
+        // Only use IntersectionObserver autoplay on touch devices
+        const isTouchDevice = window.matchMedia('(hover: none)').matches;
+        if (!isTouchDevice) return;
+
+        const video = card.querySelector('video');
+        if (!video) return;
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                const entry = entries[0];
+                if (!entry) return;
+                if (entry.isIntersecting) {
+                    video.play().catch(() => {});
+                } else {
+                    video.pause();
+                }
+            },
+            { threshold: 0.3 }
+        );
+
+        observer.observe(card);
+        return () => observer.disconnect();
+    }, []);
+
+    return (
+        <Link href={`/clips/${clip.id}`} className="block relative shrink-0">
+            <motion.div
+                ref={cardRef}
+                className="group relative w-[300px] sm:w-[450px] md:w-[600px] aspect-video rounded-2xl overflow-hidden bg-gray-100 border border-gray-100"
+                whileHover={{
+                    y: -8,
+                    boxShadow: "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)"
+                }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                onMouseEnter={(e) => {
+                    const video = e.currentTarget.querySelector('video');
+                    if (video) video.play().catch(() => {});
+                }}
+                onMouseLeave={(e) => {
+                    const video = e.currentTarget.querySelector('video');
+                    if (video) { video.pause(); video.currentTime = 0; }
+                }}
+            >
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 z-10 transition-colors duration-200 ease-out pointer-events-none" />
+                <div className="absolute bottom-5 right-5 z-20 pointer-events-none">
+                    <div className="w-14 h-14 rounded-full bg-white/40 backdrop-blur-md border border-white/60 shadow-lg flex items-center justify-center
+                            opacity-0 translate-y-2 scale-75
+                            group-hover:opacity-100 group-hover:translate-y-0 group-hover:scale-100
+                            transition-all duration-200 ease-out">
+                        <ArrowRight className="w-6 h-6 text-white -rotate-45 group-hover:rotate-0 transition-transform duration-200" />
+                    </div>
+                </div>
+                {isVideo ? (
+                    <video
+                        src={clip.file_url}
+                        poster={getPosterUrl(clip)}
+                        className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity duration-200"
+                        muted loop playsInline
+                        preload="metadata"
+                    />
+                ) : (
+                    <img
+                        src={proxyUrl(clip.sample_url || clip.file_url)}
+                        alt={clip.tags}
+                        loading="lazy"
+                        className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
+                    />
+                )}
+            </motion.div>
+        </Link>
+    );
+}
+
 export function HeroSection({ clips = [] }: HeroSectionProps) {
-    console.log("HeroSection clips:", clips.length); // ← Ajoute ça
     const marqueeClips = prepareMarquee(clips);
 
     return (
@@ -54,8 +137,6 @@ export function HeroSection({ clips = [] }: HeroSectionProps) {
             >
                 <div className="text-center max-w-4xl mx-auto mb-12">
 
-                    {/* LE BADGE "New Trending Charts" A ÉTÉ SUPPRIMÉ ICI */}
-
                     <motion.h1 variants={itemVariants} className="text-5xl md:text-7xl font-bold leading-[1.1] tracking-tight text-foreground mb-6">
                         Discover the finest
                         <span className="font-serif italic text-[#c4b5fd] block mt-2 relative">
@@ -73,11 +154,11 @@ export function HeroSection({ clips = [] }: HeroSectionProps) {
 
                     <motion.div variants={itemVariants}>
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                            <Link href="#trending" className="group h-12 px-8 rounded-full bg-[#1a1a1a] text-white font-medium flex items-center gap-2 hover:bg-black transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 duration-200">
+                            <Link href="/animations" className="group h-12 px-8 rounded-full bg-[#1a1a1a] text-white font-medium flex items-center gap-2 hover:bg-black transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 duration-200">
                                 Start Exploring <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                             </Link>
                             <Link href="/about" className="h-12 px-8 rounded-full border border-gray-200 bg-white/50 backdrop-blur-sm text-[#1a1a1a] font-medium flex items-center gap-2 hover:bg-white transition-all hover:-translate-y-1 duration-200">
-                                <Play className="w-4 h-4" /> Watch Demo
+                                <Play className="w-4 h-4" /> Learn More
                             </Link>
                         </div>
                     </motion.div>
@@ -91,58 +172,9 @@ export function HeroSection({ clips = [] }: HeroSectionProps) {
                 <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
 
                 <div className="animate-marquee gap-8 px-4 group-hover/marquee:[animation-play-state:paused]">
-                    {marqueeClips.map((clip, index) => {
-                        const isVideo = clip.file_url?.match(/\.(mp4|webm|mov)$/);
-                        const key = `${clip.id}-${index}`;
-
-                        return (
-                            <Link key={key} href={`/clips/${clip.id}`} className="block relative shrink-0">
-                                <motion.div
-                                    className="group relative w-[450px] md:w-[600px] aspect-video rounded-2xl overflow-hidden bg-gray-100 border border-gray-100"
-                                    whileHover={{
-                                        y: -8,
-                                        boxShadow: "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)"
-                                    }}
-                                    whileTap={{ scale: 0.98 }}
-                                    transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                                    onMouseEnter={(e) => {
-                                        const video = e.currentTarget.querySelector('video');
-                                        if (video) video.play().catch(() => {});
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        const video = e.currentTarget.querySelector('video');
-                                        if (video) { video.pause(); video.currentTime = 0; }
-                                    }}
-                                >
-                                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 z-10 transition-colors duration-200 ease-out pointer-events-none" />
-                                    <div className="absolute bottom-5 right-5 z-20 pointer-events-none">
-                                        <div className="w-14 h-14 rounded-full bg-white/40 backdrop-blur-md border border-white/60 shadow-lg flex items-center justify-center
-                                                opacity-0 translate-y-2 scale-75
-                                                group-hover:opacity-100 group-hover:translate-y-0 group-hover:scale-100
-                                                transition-all duration-200 ease-out">
-                                            <ArrowRight className="w-6 h-6 text-white -rotate-45 group-hover:rotate-0 transition-transform duration-200" />
-                                        </div>
-                                    </div>
-                                    {isVideo ? (
-                                        <video
-                                            src={clip.file_url}
-                                            poster={getPosterUrl(clip)}
-                                            className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity duration-200"
-                                            muted loop playsInline
-                                            preload="none"
-                                        />
-                                    ) : (
-                                        <img
-                                            src={proxyUrl(clip.sample_url || clip.file_url)}
-                                            alt={clip.tags}
-                                            loading="lazy"
-                                            className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
-                                        />
-                                    )}
-                                </motion.div>
-                            </Link>
-                        );
-                    })}
+                    {marqueeClips.map((clip, index) => (
+                        <MarqueeClip key={`${clip.id}-${index}`} clip={clip} index={index} />
+                    ))}
                 </div>
             </div>
         </section>
