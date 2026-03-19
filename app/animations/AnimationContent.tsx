@@ -379,21 +379,19 @@ export default function AnimationContent() {
                             <button
                                 onClick={() => updateURL(currentSearch, currentPage - 1)}
                                 disabled={currentPage === 1}
-                                className="group flex items-center gap-4 px-8 py-4 rounded-full border border-gray-200 hover:border-[#1a1a1a] disabled:opacity-30 disabled:hover:border-gray-200 transition-all"
+                                className="group flex items-center gap-2 md:gap-4 px-4 md:px-8 py-3 md:py-4 rounded-full border border-gray-200 hover:border-[#1a1a1a] disabled:opacity-30 disabled:hover:border-gray-200 transition-all"
                             >
                                 <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-                                <span className="font-bold text-lg">Previous</span>
+                                <span className="font-bold text-sm md:text-lg hidden sm:inline">Previous</span>
                             </button>
-
-                            <span className="font-mono text-gray-300 text-xl tracking-widest">
-                                PAGE 0{currentPage}
+                            <span className="font-mono text-gray-300 text-base md:text-xl tracking-widest">
+                                {currentPage}
                             </span>
-
                             <button
                                 onClick={() => updateURL(currentSearch, currentPage + 1)}
-                                className="group flex items-center gap-4 px-8 py-4 rounded-full bg-[#1a1a1a] text-white hover:bg-black transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1"
+                                className="group flex items-center gap-2 md:gap-4 px-4 md:px-8 py-3 md:py-4 rounded-full bg-[#1a1a1a] text-white hover:bg-black transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1"
                             >
-                                <span className="font-bold text-lg">Next Page</span>
+                                <span className="font-bold text-sm md:text-lg hidden sm:inline">Next</span>
                                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                             </button>
                         </div>
