@@ -4,6 +4,7 @@ import { DM_Sans, Instrument_Serif } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
+import Script from 'next/script';
 
 const dmSans = DM_Sans({
     subsets: ["latin"],
@@ -49,6 +50,7 @@ export const metadata: Metadata = {
         icon: '/favicon.svg',
     },
 };
+
 export default function RootLayout({
                                        children,
                                    }: Readonly<{
@@ -56,7 +58,21 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en" className="scroll-smooth">
-        <body className={`${dmSans.variable} ${instrumentSerif.variable} font-sans antialiased bg-background text-foreground bg-dot-pattern` }>
+        <body className={`${dmSans.variable} ${instrumentSerif.variable} font-sans antialiased bg-background text-foreground bg-dot-pattern`}>
+        {/* Google Analytics */}
+        <Script
+            src="https://www.googletagmanager.com/gtag/js?id=G-1BLTXQD8Q1"
+            strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+            {`
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){window.dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-1BLTXQD8Q1');
+    `}
+        </Script>
+
         <Navbar />
         {children}
         <Footer />
