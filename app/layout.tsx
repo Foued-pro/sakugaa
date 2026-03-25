@@ -59,9 +59,9 @@ export default function RootLayout({
     return (
         <html lang="en" className="scroll-smooth">
         <body className={`${dmSans.variable} ${instrumentSerif.variable} font-sans antialiased bg-background text-foreground bg-dot-pattern`}>
-        {/* Google Analytics */}
+        {/* Google Analytics - Sakugaa */}
         <Script
-            src="https://www.googletagmanager.com/gtag/js?id=G-1BLTXQD8Q1"
+            src="https://www.googletagmanager.com/gtag/js?id=G-J55R47HKP4"
             strategy="afterInteractive"
         />
         <Script id="google-analytics" strategy="afterInteractive">
@@ -69,7 +69,7 @@ export default function RootLayout({
         window.dataLayer = window.dataLayer || [];
         function gtag(){window.dataLayer.push(arguments);}
         gtag('js', new Date());
-        gtag('config', 'G-1BLTXQD8Q1');
+        gtag('config', 'G-J55R47HKP4');
     `}
         </Script>
 
