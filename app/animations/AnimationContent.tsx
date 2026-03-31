@@ -42,7 +42,7 @@ const VideoPlayer = memo(({ clip }: { clip: SakugabooruPost }) => {
     const [isHovered, setIsHovered] = useState(false);
     const [isTouchDevice, setIsTouchDevice] = useState(false);
 
-    const secureFileUrl = clip.file_url?.replace('http:', 'https:');
+    const secureFileUrl = proxyUrl(clip.file_url);
 
     // Detect touch device
     useEffect(() => {
