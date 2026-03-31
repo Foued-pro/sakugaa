@@ -9,7 +9,14 @@ export async function GET(
     const { path } = await context.params;
     const imagePath = path.join('/');
 
-    if (!imagePath.startsWith('preview/') && !imagePath.startsWith('sample/') && !imagePath.startsWith('posts/')) {
+    // Autorise preview/, sample/, posts/ et les fichiers directs sous /data/
+    const isAllowed =
+        imagePath.startsWith('preview/') ||
+        imagePath.startsWith('sample/') ||
+        imagePath.startsWith('posts/') ||
+        /^[a-f0-9]+\.(mp4|webm|jpg|jpeg|png|gif)$/i.test(imagePath);
+
+    if (!isAllowed) {
         return NextResponse.json({ error: 'Invalid path' }, { status: 400 });
     }
 

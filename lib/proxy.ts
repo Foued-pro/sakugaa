@@ -10,9 +10,8 @@ export function proxyUrl(url: string | undefined | null): string {
     const secure = url.replace('http:', 'https:');
 
     const match = secure.match(
-        /https?:\/\/(?:www\.)?sakugabooru\.com\/data\/((?:preview|sample|posts)\/.+)$/
+        /https?:\/\/(?:www\.)?sakugabooru\.com\/data\/((?:preview|sample|posts\/)?[^/]+\..+)$/
     );
-
     if (match) {
         return `/api/proxy/${match[1]}`;
     }
