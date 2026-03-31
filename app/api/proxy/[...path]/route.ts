@@ -9,7 +9,7 @@ export async function GET(
     const { path } = await context.params;
     const imagePath = path.join('/');
 
-    if (!imagePath.startsWith('preview/') && !imagePath.startsWith('sample/')) {
+    if (!imagePath.startsWith('preview/') && !imagePath.startsWith('sample/') && !imagePath.startsWith('posts/')) {
         return NextResponse.json({ error: 'Invalid path' }, { status: 400 });
     }
 

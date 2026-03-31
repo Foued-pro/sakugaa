@@ -117,7 +117,7 @@ export default function ClipPage() {
                             <div className="w-full bg-gradient-to-br from-gray-50 to-gray-100 flex justify-center items-center min-h-[400px] lg:min-h-[600px] p-6">
                                 {isVideo ? (
                                     <video
-                                        src={clip.file_url?.replace('http:', 'https:')}
+                                        src={proxyUrl(clip.file_url)}
                                         poster={proxyUrl(clip.preview_url || clip.sample_url)}
                                         controls
                                         autoPlay
