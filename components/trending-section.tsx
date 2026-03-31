@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef } from "react";
 import { useSoundEffect } from "@/lib/sounds";
-import { getPosterUrl, getImageUrl } from "@/lib/proxy";
+import {getPosterUrl, getImageUrl, proxyUrl} from "@/lib/proxy";
 import { ArrowRight, Star } from "lucide-react";
 import Link from "next/link";
 
@@ -11,7 +11,7 @@ function TrendingCard({ clip, index }: { clip: any; index: number }) {
     const { playClick } = useSoundEffect();
     const cardRef = useRef<HTMLDivElement>(null);
     const isVideo = clip.file_url?.match(/\.(mp4|webm|mov)$/);
-    const secureFileUrl = clip.file_url?.replace('http:', 'https:');
+    const secureFileUrl = proxyUrl(clip.file_url);
     const bg = previewColors[index % previewColors.length];
 
     const title = clip.tags?.split(' ').slice(0, 3).join(' ') || "Animation Clip";

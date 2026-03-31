@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, Star, Sparkles } from "lucide-react";
-import { getPosterUrl } from "@/lib/proxy";
+import { getPosterUrl, proxyUrl } from "@/lib/proxy";
 
 export const runtime = 'edge';
 
@@ -135,7 +135,7 @@ export default function ArtistDetailPage() {
                                             </div>
                                             {isVideo ? (
                                                 <video
-                                                    src={clip.file_url?.replace('http:', 'https:')}
+                                                    src={proxyUrl(clip.file_url)}
                                                     poster={getPosterUrl(clip)}
                                                     className="absolute inset-0 w-full h-full object-cover"
                                                     muted
@@ -147,7 +147,7 @@ export default function ArtistDetailPage() {
                                                 />
                                             ) : (
                                                 <img
-                                                    src={clip.sample_url?.replace('http:', 'https:') || clip.file_url?.replace('http:', 'https:')}
+                                                    src={proxyUrl(clip.sample_url || clip.file_url)}
                                                     alt={title}
                                                     loading="lazy"
                                                     className="w-full h-full object-cover"

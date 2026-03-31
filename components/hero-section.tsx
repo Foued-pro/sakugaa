@@ -81,7 +81,7 @@ function MarqueeVideo({ clip }: { clip: any }) {
             </div>
             {isVideo ? (
                 <video
-                    src={clip.file_url}
+                    src={proxyUrl(clip.file_url)}
                     poster={getPosterUrl(clip)}
                     className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity duration-200"
                     muted loop playsInline
