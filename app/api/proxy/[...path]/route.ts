@@ -9,7 +9,6 @@ export async function GET(
     const { path } = await context.params;
     const imagePath = path.join('/');
 
-    // Autorise preview/, sample/, posts/ et les fichiers directs sous /data/
     const isAllowed =
         imagePath.startsWith('preview/') ||
         imagePath.startsWith('sample/') ||
@@ -21,24 +20,33 @@ export async function GET(
     }
 
     const sourceUrl = `https://www.sakugabooru.com/data/${imagePath}`;
+    const rangeHeader = request.headers.get('range');
 
     try {
         const response = await fetch(sourceUrl, {
             headers: {
                 'User-Agent': 'Sakugaa/1.0 (https://sakugaa.com)',
+                ...(rangeHeader && { 'Range': rangeHeader }),
             },
         });
 
-        if (!response.ok) {
+        if (!response.ok && response.status !== 206) {
             return new NextResponse('Not found', { status: 404 });
         }
 
         const contentType = response.headers.get('content-type') || 'image/jpeg';
 
         return new NextResponse(response.body, {
-            status: 200,
+            status: response.status,
             headers: {
                 'Content-Type': contentType,
+                'Accept-Ranges': 'bytes',
+                ...(response.headers.get('content-range') && {
+                    'Content-Range': response.headers.get('content-range')!
+                }),
+                ...(response.headers.get('content-length') && {
+                    'Content-Length': response.headers.get('content-length')!
+                }),
                 'Cache-Control': 'public, max-age=2592000, stale-while-revalidate=86400, immutable',
                 'CDN-Cache-Control': 'public, max-age=2592000',
                 'Access-Control-Allow-Origin': '*',
