@@ -80,28 +80,35 @@ const VideoPlayer = memo(({ clip, playMode = 'hover', showOverlay = false, class
     return (
         <div
             ref={containerRef}
-            className={`group/video relative w-full h-full bg-gray-200 ${className}`}
+            className={`group/video relative w-full h-full ${className}`}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
+            {/* Poster toujours présent */}
             <img
                 src={posterUrl}
                 alt=""
                 className="absolute inset-0 w-full h-full object-cover z-0"
             />
+
+            {/* Vidéo montée dès isInView, fade in quand prête */}
             {isInView && (
                 <video
                     ref={videoRef}
                     src={secureFileUrl}
                     poster={posterUrl}
-                    className="absolute inset-0 w-full h-full object-cover z-[1]"
+                    className="absolute inset-0 w-full h-full object-cover z-[1] opacity-0 transition-opacity duration-500"
                     muted
                     loop
                     playsInline
+                    autoPlay
                     preload="metadata"
-                    autoPlay={playMode === 'auto' || isTouchDevice}
+                    onCanPlay={(e) => {
+                        (e.target as HTMLVideoElement).style.opacity = '1';
+                    }}
                 />
             )}
+
             {showOverlay && (
                 <div className="absolute bottom-3 right-3 z-20 opacity-0 group-hover/video:opacity-100 transition-all duration-300 pointer-events-none">
                     <div className="w-10 h-10 rounded-full bg-white/30 backdrop-blur-md flex items-center justify-center transform translate-y-4 group-hover/video:translate-y-0 transition-all duration-300 border border-white/50">
