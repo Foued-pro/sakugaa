@@ -27,8 +27,7 @@ const getTagsList = (tagString: string | undefined) =>
 export default function ClipPage() {
     const router = useRouter();
     const params = useParams();
-    // Fix: id peut être string | string[]
-    const id = Array.isArray(params.id) ? params.id[0] : params.id;
+    const id = Array.isArray(params.id) ? params.id[0] : params.id ?? '';
 
     const [clip, setClip] = useState<SakugabooruPost | null>(null);
     const [loading, setLoading] = useState(true);
@@ -123,7 +122,7 @@ export default function ClipPage() {
                         <div className="bg-white border border-gray-100 rounded-3xl overflow-hidden shadow-lg">
                             <div className="w-full bg-gray-50 flex justify-center items-center min-h-[400px] lg:min-h-[600px] p-6">
                                 {isVideo ? (
-                                    <div className="w-full h-full rounded-2xl overflow-hidden">
+                                    <div className="w-full aspect-video rounded-2xl overflow-hidden">
                                         <VideoPlayer clip={clip} playMode="auto" />
                                     </div>
                                 ) : (
