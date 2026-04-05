@@ -27,7 +27,8 @@ export async function fetchClips(
     }
 }
 
-export async function fetchClipById(id: string) {
+export async function fetchClipById(id: string | undefined) {
+    if (!id) return null;
     const response = await fetch(`/api/clips?tags=id:${id}&limit=1`);
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const data = await response.json();
