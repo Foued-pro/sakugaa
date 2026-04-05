@@ -1,7 +1,10 @@
+const SKELETON_CARDS = 6;
+const SKELETON_TAGS = 5;
+
 export function LoadingSkeleton() {
     return (
         <div className="min-h-screen bg-white">
-            <div className="relative pt-32 pb-16 px-6 md:px-12 border-b border-gray-100 bg-white/80 backdrop-blur-xl">
+            <div className="relative pt-32 pb-16 px-6 md:px-12 border-b border-gray-100">
                 <div className="max-w-[1600px] mx-auto">
                     <div className="flex flex-col lg:flex-row items-start lg:items-end justify-between gap-8 mb-10">
                         <div className="w-full lg:w-auto">
@@ -15,12 +18,12 @@ export function LoadingSkeleton() {
                             </div>
                         </div>
                         <div className="w-full lg:w-auto lg:min-w-[500px]">
-                            <div className="h-16 bg-gray-50 rounded-full animate-pulse shadow-sm" />
+                            <div className="h-16 bg-gray-50 rounded-full animate-pulse" />
                         </div>
                     </div>
                     <div className="flex flex-wrap gap-3 items-center">
                         <div className="h-4 w-16 bg-gray-300 rounded animate-pulse" />
-                        {[...Array(5)].map((_, i) => (
+                        {[...Array(SKELETON_TAGS)].map((_, i) => (
                             <div key={i} className="h-10 w-32 bg-gray-100 border border-gray-200 rounded-full animate-pulse" />
                         ))}
                     </div>
@@ -28,8 +31,8 @@ export function LoadingSkeleton() {
             </div>
             <div className="px-6 md:px-12 py-12 max-w-[1600px] mx-auto">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
-                    {[...Array(6)].map((_, i) => (
-                        <div key={i} className="bg-white border border-gray-100 rounded-3xl p-3 shadow-sm animate-pulse">
+                    {[...Array(SKELETON_CARDS)].map((_, i) => (
+                        <div key={i} className="bg-white border border-gray-100 rounded-3xl p-3 animate-pulse">
                             <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl mb-4" />
                             <div className="px-2 space-y-2">
                                 <div className="h-5 bg-gray-200 rounded w-3/4" />

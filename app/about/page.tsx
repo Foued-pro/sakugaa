@@ -12,7 +12,6 @@ export default function AboutPage() {
         <main className="min-h-screen bg-white">
             <div className="pt-32 pb-24 px-6 md:px-12">
                 <div className="max-w-4xl mx-auto">
-
                     <span className="text-[#c4b5fd] font-bold text-xs uppercase tracking-widest">About</span>
                     <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-[#1a1a1a] mt-4 leading-[0.95]">
                         The art of animation

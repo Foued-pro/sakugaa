@@ -1,15 +1,16 @@
 "use client";
 
-import { useState, useEffect, useRef, memo, useCallback, useMemo } from "react";
+import { useState, useEffect, memo, useCallback, useMemo } from "react";
 import { useRouter, useSearchParams } from 'next/navigation';
 import { fetchClips } from '@/lib/sakugabooru';
 import type { SakugabooruPost } from '../type/sakugabooru';
-import { useInView } from '../hook/useInView';
+import { LoadingSkeleton } from './loading-skeleton';
+import VideoPlayer from '@/components/VideoPlayer';
 import Link from "next/link";
 import Masonry from 'react-masonry-css';
 import { motion } from "framer-motion";
 import { Search, Sparkles, Filter, ArrowRight, ArrowLeft, Star, X } from "lucide-react";
-import { proxyUrl, getPosterUrl, getImageUrl } from "@/lib/proxy";
+import { proxyUrl } from "@/lib/proxy";
 
 const MASONRY_BREAKPOINTS = {
     default: 3,
@@ -36,111 +37,11 @@ const CARD_TRANSITION = {
     ease: [0.22, 1, 0.36, 1] as const
 };
 
-const VideoPlayer = memo(({ clip }: { clip: SakugabooruPost }) => {
-    const { ref: containerRef, isInView } = useInView<HTMLDivElement>(0.2);
-    const videoRef = useRef<HTMLVideoElement>(null);
-    const [isHovered, setIsHovered] = useState(false);
-    const [isTouchDevice, setIsTouchDevice] = useState(false);
-
-    const secureFileUrl = proxyUrl(clip.file_url);
-
-    // Detect touch device
-    useEffect(() => {
-        setIsTouchDevice(window.matchMedia('(hover: none)').matches);
-    }, []);
-
-    useEffect(() => {
-        const videoElement = videoRef.current;
-        return () => {
-            if (videoElement) {
-                videoElement.pause();
-                videoElement.removeAttribute('src');
-                videoElement.load();
-            }
-        };
-    }, []);
-
-    // Desktop: hover to play
-    useEffect(() => {
-        if (isTouchDevice) return;
-        const video = videoRef.current;
-        if (!video || !isInView) return;
-
-        if (isHovered) {
-            video.play().catch(() => {});
-        } else {
-            video.pause();
-            video.currentTime = 0;
-        }
-    }, [isHovered, isInView, isTouchDevice]);
-
-    // Mobile: autoplay when visible in viewport
-    useEffect(() => {
-        if (!isTouchDevice || !isInView) return;
-        const video = videoRef.current;
-        if (!video) return;
-
-        const observer = new IntersectionObserver(
-            (entries) => {
-                const entry = entries[0];
-                if (!entry) return;
-                if (entry.isIntersecting) {
-                    video.play().catch(() => {});
-                } else {
-                    video.pause();
-                }
-            },
-            { threshold: 0.5 }
-        );
-
-        observer.observe(video);
-        return () => observer.disconnect();
-    }, [isTouchDevice, isInView]);
-
-    const posterUrl = getPosterUrl(clip);
-
-    return (
-        <div
-            ref={containerRef}
-            className="group/video relative w-full h-full bg-gray-200"
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-        >
-            {/* Poster image visible immédiatement, avant que la vidéo charge */}
-            <img
-                src={posterUrl}
-                alt=""
-                className="absolute inset-0 w-full h-full object-cover z-0"
-            />
-            {isInView && (
-                <video
-                    ref={videoRef}
-                    src={secureFileUrl}
-                    poster={posterUrl}
-                    className="absolute inset-0 w-full h-full object-cover z-[1]"
-                    muted
-                    loop
-                    playsInline
-                    preload="metadata"
-                />
-            )}
-
-            <div className="absolute bottom-3 right-3 z-20 opacity-0 group-hover/video:opacity-100 transition-all duration-300 pointer-events-none">
-                <div className="w-10 h-10 rounded-full bg-white/30 backdrop-blur-md flex items-center justify-center transform translate-y-4 group-hover/video:translate-y-0 transition-all duration-300 border border-white/50 shadow-lg">
-                    <ArrowRight className="w-5 h-5 text-white" />
-                </div>
-            </div>
-        </div>
-    );
-});
-VideoPlayer.displayName = "VideoPlayer";
-
 const ClipCard = memo(({ clip }: { clip: SakugabooruPost }) => {
     if (!clip.file_url) return null;
     const isVideo = ['mp4', 'webm', 'mov', 'mkv'].includes(clip.file_ext);
-    const artistName = clip.tags?.split(' ').find(t => t.includes('animator')) || clip.author || 'Unknown';
+    const artistName = clip.author || 'Unknown';
     const title = clip.tags?.split(' ').slice(0, 3).join(' ').replace(/_/g, ' ') || "Animation Clip";
-
     const rawImageUrl = clip.sample_url || clip.preview_url || (!isVideo ? clip.file_url : null);
     const secureImageUrl = rawImageUrl ? proxyUrl(rawImageUrl) : '';
 
@@ -157,17 +58,17 @@ const ClipCard = memo(({ clip }: { clip: SakugabooruPost }) => {
                 <div className="group bg-white border border-gray-100 rounded-3xl p-3 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col">
                     <div className="aspect-video rounded-2xl overflow-hidden relative shrink-0 bg-gray-100">
                         {isVideo ? (
-                            <VideoPlayer clip={clip} />
+                            <VideoPlayer clip={clip} playMode="hover" showOverlay />
                         ) : (
                             <div className="relative w-full h-full group/image">
                                 <img
-                                    src={secureImageUrl || ''}
+                                    src={secureImageUrl}
                                     alt={title}
                                     loading="lazy"
                                     className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                                 />
                                 <div className="absolute bottom-3 right-3 z-20 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                                    <div className="w-10 h-10 rounded-full bg-white/30 backdrop-blur-md flex items-center justify-center transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 border border-white/50 shadow-lg">
+                                    <div className="w-10 h-10 rounded-full bg-white/30 backdrop-blur-md flex items-center justify-center transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 border border-white/50">
                                         <ArrowRight className="w-5 h-5 text-white" />
                                     </div>
                                 </div>
@@ -214,15 +115,12 @@ export default function AnimationContent() {
 
     const updateURL = useCallback((newSearch?: string, newPage?: number) => {
         const currentParams = new URLSearchParams(searchParams.toString());
-
         if (newSearch !== undefined) {
             newSearch ? currentParams.set('search', newSearch) : currentParams.delete('search');
         }
-
         if (newPage !== undefined) {
             newPage > 1 ? currentParams.set('page', newPage.toString()) : currentParams.delete('page');
         }
-
         router.push(`/animations?${currentParams.toString()}`);
     }, [searchParams, router]);
 
@@ -243,19 +141,12 @@ export default function AnimationContent() {
                 setLoading(true);
                 setError(null);
                 const data = await fetchClips(15, currentPage, currentSearch, { signal: abortController.signal });
-
                 if (!abortController.signal.aborted) {
-                    if (Array.isArray(data)) {
-                        setClips(data);
-                    } else {
-                        setClips([]);
-                    }
+                    setClips(Array.isArray(data) ? data : []);
                 }
             } catch (error: unknown) {
                 if (error instanceof Error && error.name === 'AbortError') return;
-
                 if (!abortController.signal.aborted) {
-                    console.error("Fetch error:", error);
                     setError(error instanceof Error ? error.message : "Erreur inconnue");
                 }
             } finally {
@@ -266,7 +157,6 @@ export default function AnimationContent() {
         }
 
         loadClips();
-
         return () => abortController.abort();
     }, [currentPage, currentSearch]);
 
@@ -276,7 +166,7 @@ export default function AnimationContent() {
 
     return (
         <div className="min-h-screen bg-white text-[#1a1a1a]">
-            <div className="relative pt-32 pb-16 px-6 md:px-12 border-b border-gray-100 bg-white/80 backdrop-blur-xl transition-all duration-300">
+            <div className="relative pt-32 pb-16 px-6 md:px-12 border-b border-gray-100 transition-all duration-300">
                 <div className="max-w-[1600px] mx-auto">
                     <div className="flex flex-col lg:flex-row items-start lg:items-end justify-between gap-8 mb-10">
                         <div>
@@ -293,7 +183,6 @@ export default function AnimationContent() {
                                 <span className="text-gray-300">Collection.</span>
                             </h1>
                         </div>
-
                         <div className="w-full lg:w-auto lg:min-w-[500px]">
                             <div className="relative group">
                                 <div className="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none">
@@ -308,7 +197,7 @@ export default function AnimationContent() {
                                     onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                                 />
                                 {searchInput && (
-                                    <button onClick={() => {setSearchInput(''); updateURL('', 1)}} className="absolute inset-y-0 right-4 flex items-center p-2 text-gray-400 hover:text-red-500 transition-colors">
+                                    <button onClick={() => { setSearchInput(''); updateURL('', 1); }} className="absolute inset-y-0 right-4 flex items-center p-2 text-gray-400 hover:text-red-500 transition-colors">
                                         <X className="w-5 h-5" />
                                     </button>
                                 )}
@@ -318,7 +207,6 @@ export default function AnimationContent() {
                             </div>
                         </div>
                     </div>
-
                     <div className="flex flex-wrap gap-3 items-center">
                         <span className="text-sm font-bold text-gray-400 mr-2">Trending:</span>
                         {POPULAR_TAGS.map(tag => (
@@ -326,8 +214,8 @@ export default function AnimationContent() {
                                 key={tag}
                                 onClick={() => updateURL(tag, 1)}
                                 className={`text-sm px-5 py-2 rounded-full transition-all duration-300 font-medium border ${currentSearch === tag
-                                    ? 'bg-[#1a1a1a] text-white border-[#1a1a1a]'
-                                    : 'bg-white text-gray-500 border-gray-200 hover:border-gray-400 hover:text-[#1a1a1a]'}`}
+    ? 'bg-[#1a1a1a] text-white border-[#1a1a1a]'
+    : 'bg-white text-gray-500 border-gray-200 hover:border-gray-400 hover:text-[#1a1a1a]'}`}
                             >
                                 {tag.replace(/_/g, ' ')}
                             </button>
@@ -343,23 +231,13 @@ export default function AnimationContent() {
 
             <div className="px-6 md:px-12 py-12 max-w-[1600px] mx-auto min-h-[60vh]">
                 {loading ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
-                        {[...Array(6)].map((_, i) => (
-                            <div key={i} className="bg-white border border-gray-100 rounded-3xl p-3 h-full animate-pulse">
-                                <div className="aspect-video bg-gray-200 rounded-2xl mb-4" />
-                                <div className="px-2 space-y-2">
-                                    <div className="h-5 bg-gray-200 rounded w-3/4" />
-                                    <div className="h-4 bg-gray-200 rounded w-1/2" />
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+                    <LoadingSkeleton />
                 ) : error ? (
                     <div className="flex flex-col items-center justify-center py-32 text-center">
                         <div className="p-6 rounded-full bg-red-50 mb-6"><Filter className="w-10 h-10 text-red-500" /></div>
-                        <h2 className="text-3xl font-bold mb-3 tracking-tight text-[#1a1a1a]">No results found</h2>
+                        <h2 className="text-3xl font-bold mb-3 tracking-tight text-[#1a1a1a]">Something went wrong</h2>
                         <p className="text-gray-500 mb-8 text-lg max-w-md">{error}</p>
-                        <button onClick={() => {setSearchInput(''); updateURL('', 1)}} className="px-8 py-4 bg-[#1a1a1a] text-white rounded-full font-bold text-lg hover:bg-black transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1">
+                        <button onClick={() => { setSearchInput(''); updateURL('', 1); }} className="px-8 py-4 bg-[#1a1a1a] text-white rounded-full font-bold text-lg hover:bg-black transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1">
                             Clear Search
                         </button>
                     </div>
@@ -374,7 +252,6 @@ export default function AnimationContent() {
                                 <ClipCard key={clip.id} clip={clip} />
                             ))}
                         </Masonry>
-
                         <div className="flex justify-between items-center mt-20 pt-10 border-t border-gray-100">
                             <button
                                 onClick={() => updateURL(currentSearch, currentPage - 1)}
@@ -384,9 +261,7 @@ export default function AnimationContent() {
                                 <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
                                 <span className="font-bold text-sm md:text-lg hidden sm:inline">Previous</span>
                             </button>
-                            <span className="font-mono text-gray-300 text-base md:text-xl tracking-widest">
-                                {currentPage}
-                            </span>
+                            <span className="font-mono text-gray-300 text-base md:text-xl tracking-widest">{currentPage}</span>
                             <button
                                 onClick={() => updateURL(currentSearch, currentPage + 1)}
                                 className="group flex items-center gap-2 md:gap-4 px-4 md:px-8 py-3 md:py-4 rounded-full bg-[#1a1a1a] text-white hover:bg-black transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1"
