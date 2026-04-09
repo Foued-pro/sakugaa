@@ -1,6 +1,4 @@
 "use client";
-export const runtime = 'edge';
-
 import { useEffect, useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { fetchClipById } from "../../../lib/sakugabooru";
@@ -35,6 +33,7 @@ export default function ClipPage() {
     const [error, setError] = useState<string | null>(null);
     const [isDownloading, setIsDownloading] = useState(false);
     const downloadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const [videoSrc, setVideoSrc] = useState<string | undefined>(undefined);
 
     useEffect(() => {
         if (!id) return;
@@ -44,11 +43,11 @@ export default function ClipPage() {
                 const data = await fetchClipById(id);
                 if (!data) throw new Error("Clip introuvable");
                 setClip(data);
-                if (data.file_url && VIDEO_EXTS.includes(data.file_ext) && !videoCache.get(data.id)) {
-                    const res = await fetch(proxyUrl(data.file_url));
-                    const blob = await res.blob();
-                    videoCache.set(data.id, URL.createObjectURL(blob));
-                }
+
+                // si le preload home a déjà terminé, on l'utilise
+                const cached = videoCache.get(data.id);
+                if (cached) setVideoSrc(cached);
+                // sinon VideoPlayer charge via proxyUrl normalement
             } catch (err) {
                 console.error(err);
                 setError("Impossible de charger le clip.");
@@ -106,7 +105,6 @@ export default function ClipPage() {
 
     const isVideo = VIDEO_EXTS.includes(clip.file_ext);
     const tags = getTagsList(clip.tags);
-    const videoSrc = videoCache.get(clip.id) || undefined;
     return (
         <main className="min-h-screen bg-white">
             <div className="sticky top-20 z-40 bg-white border-b border-gray-100">

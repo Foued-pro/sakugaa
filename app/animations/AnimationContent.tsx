@@ -11,7 +11,7 @@ import Masonry from 'react-masonry-css';
 import { motion } from "framer-motion";
 import { Search, Sparkles, Filter, ArrowRight, ArrowLeft, Star, X } from "lucide-react";
 import { proxyUrl } from "@/lib/proxy";
-import { enqueuePreload } from '@/lib/videoCache';
+import { enqueuePreload, clearCache } from '@/lib/videoCache';
 
 const MASONRY_BREAKPOINTS = {
     default: 3,
@@ -107,18 +107,25 @@ const ClipCard = memo(({ clip }: { clip: SakugabooruPost }) => {
 });
 ClipCard.displayName = "ClipCard";
 
-export default function AnimationContent() {
+export default function AnimationContent({ allTags }: { allTags: string[] }) {
     const router = useRouter();
     const searchParams = useSearchParams();
 
     const pageParam = searchParams.get('page');
     const currentPage = useMemo(() => pageParam ? Math.max(1, parseInt(pageParam)) : 1, [pageParam]);
-    const currentSearch = useMemo(() => searchParams.get('search') || '', [searchParams]);
+
+    const currentTags = useMemo(() => {
+        const s = searchParams.get('search') || '';
+        return s ? s.split(' ').filter(Boolean) : [];
+    }, [searchParams]);
+
+    const currentSearch = useMemo(() => currentTags.join(' '), [currentTags]);
 
     const [clips, setClips] = useState<SakugabooruPost[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [searchInput, setSearchInput] = useState(currentSearch);
+    const [searchInput, setSearchInput] = useState('');
+    const [suggestions, setSuggestions] = useState<string[]>([]);
 
     const updateURL = useCallback((newSearch?: string, newPage?: number) => {
         const currentParams = new URLSearchParams(searchParams.toString());
@@ -131,10 +138,34 @@ export default function AnimationContent() {
         router.push(`/animations?${currentParams.toString()}`);
     }, [searchParams, router]);
 
+    const addTag = useCallback((tag: string) => {
+        const trimmed = tag.trim().replace(/ /g, '_');
+        if (!trimmed || currentTags.includes(trimmed)) return;
+        updateURL([...currentTags, trimmed].join(' '), 1);
+        setSearchInput('');
+        setSuggestions([]);
+    }, [currentTags, updateURL]);
+
+    const removeTag = useCallback((tag: string) => {
+        const next = currentTags.filter(t => t !== tag);
+        updateURL(next.join(' '), 1);
+    }, [currentTags, updateURL]);
+
     const handleSearch = useCallback(() => {
-        if (!searchInput.trim() && !currentSearch) return;
-        updateURL(searchInput.trim(), 1);
-    }, [searchInput, currentSearch, updateURL]);
+        if (!searchInput.trim()) return;
+        addTag(searchInput.trim());
+    }, [searchInput, addTag]);
+
+    const handleInputChange = (val: string) => {
+        setSearchInput(val);
+        if (val.length < 2) return setSuggestions([]);
+        const q = val.toLowerCase().replace(/ /g, '_');
+        setSuggestions(
+            allTags
+                .filter(t => t.includes(q) && !currentTags.includes(t))
+                .slice(0, 8)
+        );
+    };
 
     useEffect(() => {
         setClips([]);
@@ -168,8 +199,8 @@ export default function AnimationContent() {
     }, [currentPage, currentSearch]);
 
     useEffect(() => {
-        setSearchInput(currentSearch);
-    }, [currentSearch]);
+        return () => clearCache();
+    }, [currentSearch, currentPage]);
 
     return (
         <div className="min-h-screen bg-white text-[#1a1a1a]">
@@ -190,48 +221,95 @@ export default function AnimationContent() {
                                 <span className="text-gray-300">Collection.</span>
                             </h1>
                         </div>
-                        <div className="w-full lg:w-auto lg:min-w-[500px]">
+                        <div className="w-full lg:w-auto lg:min-w-[500px] flex flex-col gap-3">
                             <div className="relative group">
-                                <div className="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none">
-                                    <Search className="h-5 w-5 text-gray-400 group-focus-within:text-[#1a1a1a] transition-colors" />
+                                <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                                    <Search className="h-[18px] w-[18px] text-gray-400 group-focus-within:text-[#1a1a1a] transition-colors" />
                                 </div>
                                 <input
                                     type="text"
-                                    placeholder="Search artists, anime, tags..."
-                                    className="w-full pl-14 pr-14 py-5 bg-gray-50 border-none rounded-full text-lg font-medium text-[#1a1a1a] placeholder-gray-400 focus:ring-0 focus:bg-gray-100 transition-all shadow-sm group-hover:shadow-md"
+                                    placeholder="Add a tag to filter..."
+                                    className="w-full pl-12 pr-20 py-4 bg-gray-50 border border-gray-100 focus:border-gray-300 focus:bg-white rounded-full text-[15px] text-[#1a1a1a] placeholder-gray-400 focus:outline-none transition-all"
                                     value={searchInput}
-                                    onChange={(e) => setSearchInput(e.target.value)}
+                                    onChange={(e) => handleInputChange(e.target.value)}
                                     onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                                    onBlur={() => setTimeout(() => setSuggestions([]), 150)}
                                 />
                                 {searchInput && (
-                                    <button onClick={() => { setSearchInput(''); updateURL('', 1); }} className="absolute inset-y-0 right-4 flex items-center p-2 text-gray-400 hover:text-red-500 transition-colors">
-                                        <X className="w-5 h-5" />
+                                    <button
+                                        onClick={() => { setSearchInput(''); setSuggestions([]); }}
+                                        className="absolute inset-y-0 right-12 flex items-center px-2 text-gray-400 hover:text-gray-600 transition-colors"
+                                    >
+                                        <X className="w-4 h-4" />
                                     </button>
                                 )}
-                                <button onClick={handleSearch} className="absolute inset-y-2 right-2 p-3 bg-[#1a1a1a] text-white rounded-full hover:scale-105 transition-transform shadow-lg hidden sm:flex">
-                                    <ArrowRight className="w-5 h-5" />
+                                <button
+                                    onClick={handleSearch}
+                                    className="absolute inset-y-1.5 right-1.5 w-9 h-9 bg-[#1a1a1a] text-white rounded-full hover:opacity-80 transition-opacity flex items-center justify-center"
+                                >
+                                    <ArrowRight className="w-4 h-4" />
                                 </button>
+
+                                {suggestions.length > 0 && (
+                                    <div className="absolute top-[calc(100%+8px)] left-0 right-0 bg-white border border-gray-100 rounded-2xl overflow-hidden z-50 p-1.5">
+                                        {suggestions.map(tag => (
+                                            <button
+                                                key={tag}
+                                                onMouseDown={() => addTag(tag)}
+                                                className="w-full text-left flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                                            >
+                                                <Search className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                                                <span>{tag.replace(/_/g, ' ')}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
+
+                            {currentTags.length > 0 && (
+                                <div className="flex flex-wrap gap-2">
+                                    {currentTags.map(tag => (
+                                        <span
+                                            key={tag}
+                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#1a1a1a] text-white text-sm font-medium rounded-full"
+                                        >
+                                            {tag.replace(/_/g, ' ')}
+                                            <button
+                                                onClick={() => removeTag(tag)}
+                                                className="hover:text-gray-300 transition-colors"
+                                            >
+                                                <X className="w-3.5 h-3.5" />
+                                            </button>
+                                        </span>
+                                    ))}
+                                    {currentTags.length > 1 && (
+                                        <button
+                                            onClick={() => updateURL('', 1)}
+                                            className="px-3 py-1.5 text-sm text-red-500 font-medium hover:text-red-600 transition-colors"
+                                        >
+                                            Clear all
+                                        </button>
+                                    )}
+                                </div>
+                            )}
                         </div>
                     </div>
+
                     <div className="flex flex-wrap gap-3 items-center">
                         <span className="text-sm font-bold text-gray-400 mr-2">Trending:</span>
                         {POPULAR_TAGS.map(tag => (
                             <button
                                 key={tag}
-                                onClick={() => updateURL(tag, 1)}
-                                className={`text-sm px-5 py-2 rounded-full transition-all duration-300 font-medium border ${currentSearch === tag
-    ? 'bg-[#1a1a1a] text-white border-[#1a1a1a]'
-    : 'bg-white text-gray-500 border-gray-200 hover:border-gray-400 hover:text-[#1a1a1a]'}`}
+                                onClick={() => addTag(tag)}
+                                className={`text-sm px-5 py-2 rounded-full transition-all duration-300 font-medium border ${
+                                    currentTags.includes(tag)
+                                        ? 'bg-[#1a1a1a] text-white border-[#1a1a1a]'
+                                        : 'bg-white text-gray-500 border-gray-200 hover:border-gray-400 hover:text-[#1a1a1a]'
+                                }`}
                             >
                                 {tag.replace(/_/g, ' ')}
                             </button>
                         ))}
-                        {currentSearch && (
-                            <button onClick={() => updateURL('', 1)} className="text-sm px-5 py-2 rounded-full bg-red-50 text-red-500 font-bold hover:bg-red-100 transition-colors ml-auto">
-                                Clear Filters
-                            </button>
-                        )}
                     </div>
                 </div>
             </div>
@@ -244,7 +322,7 @@ export default function AnimationContent() {
                         <div className="p-6 rounded-full bg-red-50 mb-6"><Filter className="w-10 h-10 text-red-500" /></div>
                         <h2 className="text-3xl font-bold mb-3 tracking-tight text-[#1a1a1a]">Something went wrong</h2>
                         <p className="text-gray-500 mb-8 text-lg max-w-md">{error}</p>
-                        <button onClick={() => { setSearchInput(''); updateURL('', 1); }} className="px-8 py-4 bg-[#1a1a1a] text-white rounded-full font-bold text-lg hover:bg-black transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1">
+                        <button onClick={() => updateURL('', 1)} className="px-8 py-4 bg-[#1a1a1a] text-white rounded-full font-bold text-lg hover:bg-black transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1">
                             Clear Search
                         </button>
                     </div>

@@ -1,11 +1,16 @@
-import { Suspense } from 'react';
-import AnimationContent from './AnimationContent';
-import { LoadingSkeleton } from './loading-skeleton';
+import AnimationContent from '../animations/AnimationContent';
+import { readFile } from 'fs/promises';
+import path from 'path';
 
-export default function AnimationPage() {
-    return (
-        <Suspense fallback={<LoadingSkeleton />}>
-            <AnimationContent />
-        </Suspense>
-    );
+export default async function AnimationsPage() {
+    let allTags: string[] = [];
+    try {
+        const filePath = path.join(process.cwd(), 'public', 'tags.json');
+        const raw = await readFile(filePath, 'utf-8');
+        allTags = JSON.parse(raw);
+    } catch {
+        // autocomplete désactivé silencieusement
+    }
+
+    return <AnimationContent allTags={allTags} />;
 }

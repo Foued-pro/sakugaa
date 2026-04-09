@@ -3,7 +3,7 @@ const preloadQueue: (() => Promise<void>)[] = [];
 let activePreloads = 0;
 
 function runQueue() {
-    while (preloadQueue.length > 0 && activePreloads < 2) {
+    while (preloadQueue.length > 0 && activePreloads < 1) {
         const task = preloadQueue.shift()!;
         activePreloads++;
         task().finally(() => { activePreloads--; runQueue(); });
@@ -12,15 +12,21 @@ function runQueue() {
 
 export function enqueuePreload(clipId: number, url: string) {
     if (videoCache.has(clipId)) return;
-    videoCache.set(clipId, ''); // marque comme "en cours" pour éviter le double enqueue
+    videoCache.set(clipId, '');
     preloadQueue.push(async () => {
         try {
-            const res = await fetch(url);
-            const blob = await res.blob();
-            videoCache.set(clipId, URL.createObjectURL(blob));
+            await fetch(url, { cache: 'force-cache' });
+            videoCache.set(clipId, url);
         } catch {
             videoCache.delete(clipId);
         }
     });
     runQueue();
+}
+export function clearCache() {
+    for (const url of videoCache.values()) {
+        if (url) URL.revokeObjectURL(url);
+    }
+    videoCache.clear();
+    preloadQueue.length = 0;
 }
