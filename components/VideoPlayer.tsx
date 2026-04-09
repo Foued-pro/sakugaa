@@ -100,7 +100,7 @@ const VideoPlayer = memo(({ clip, playMode = 'hover', showOverlay = false, class
                     loop
                     playsInline
                     autoPlay
-                    preload="metadata"
+                    preload="none"
                     onCanPlay={(e) => {
                         (e.target as HTMLVideoElement).style.opacity = '1';
                     }}
