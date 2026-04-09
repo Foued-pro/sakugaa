@@ -2,6 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const runtime = 'edge';
 
+export async function OPTIONS() {
+    return new NextResponse(null, {
+        status: 204,
+        headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, OPTIONS',
+            'Access-Control-Allow-Headers': 'Range',
+        },
+    });
+}
+
 export async function GET(
     request: NextRequest,
     context: { params: Promise<{ path: string[] }> }
@@ -50,6 +61,7 @@ export async function GET(
                 'Cache-Control': 'public, max-age=2592000, stale-while-revalidate=86400, immutable',
                 'CDN-Cache-Control': 'public, max-age=2592000',
                 'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Headers': 'Range',
             },
         });
     } catch (error) {
