@@ -97,11 +97,15 @@ const VideoPlayer = memo(({ clip, playMode = 'hover', showOverlay = false, class
                     poster={posterUrl}
                     className="absolute inset-0 w-full h-full object-cover z-[1] opacity-0 transition-opacity duration-500"
                     muted
-                    loop
                     playsInline
                     preload="none"
                     onCanPlay={(e) => {
                         (e.target as HTMLVideoElement).style.opacity = '1';
+                    }}
+                    onEnded={(e) => {
+                        const v = e.target as HTMLVideoElement;
+                        v.currentTime = 0;
+                        v.play().catch(() => {});
                     }}
                 />
             )}
