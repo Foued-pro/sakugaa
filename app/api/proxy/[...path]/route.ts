@@ -9,6 +9,7 @@ export async function OPTIONS() {
             'Access-Control-Allow-Origin': '*',
             'Access-Control-Allow-Methods': 'GET, OPTIONS',
             'Access-Control-Allow-Headers': 'Range',
+            'Access-Control-Max-Age': '86400',
         },
     });
 }
@@ -62,6 +63,7 @@ export async function GET(
                 'CDN-Cache-Control': 'public, max-age=2592000',
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Headers': 'Range',
+                'Access-Control-Expose-Headers': 'Content-Range, Content-Length, Accept-Ranges',
             },
         });
     } catch (error) {
