@@ -25,9 +25,7 @@ const VideoPlayer = memo(({ clip, playMode = 'hover', showOverlay = false, class
     useEffect(() => {
         setIsTouchDevice(window.matchMedia('(hover: none)').matches);
     }, []);
-    useEffect(() => {
-        console.log('isInView:', isInView, 'isTouchDevice:', isTouchDevice);
-    }, [isInView, isTouchDevice]);
+
 
     useEffect(() => {
         return () => {
