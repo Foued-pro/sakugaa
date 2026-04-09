@@ -7,6 +7,7 @@ import { fetchClipById } from "../../../lib/sakugabooru";
 import { proxyUrl } from "../../../lib/proxy";
 import VideoPlayer from "@/components/VideoPlayer";
 import type { SakugabooruPost } from "@/app/type/sakugabooru";
+import { videoCache } from "../../../lib/videoCache";
 import {
     Calendar, User, ExternalLink, Download,
     Tag, AlertCircle, Loader2, ArrowLeft, Star
@@ -43,6 +44,11 @@ export default function ClipPage() {
                 const data = await fetchClipById(id);
                 if (!data) throw new Error("Clip introuvable");
                 setClip(data);
+                if (data.file_url && VIDEO_EXTS.includes(data.file_ext) && !videoCache.get(data.id)) {
+                    const res = await fetch(proxyUrl(data.file_url));
+                    const blob = await res.blob();
+                    videoCache.set(data.id, URL.createObjectURL(blob));
+                }
             } catch (err) {
                 console.error(err);
                 setError("Impossible de charger le clip.");
@@ -98,10 +104,9 @@ export default function ClipPage() {
         );
     }
 
-    // Fix: utilise file_ext comme partout ailleurs
     const isVideo = VIDEO_EXTS.includes(clip.file_ext);
     const tags = getTagsList(clip.tags);
-
+    const videoSrc = videoCache.get(clip.id) || undefined;
     return (
         <main className="min-h-screen bg-white">
             <div className="sticky top-20 z-40 bg-white border-b border-gray-100">
@@ -123,7 +128,7 @@ export default function ClipPage() {
                             <div className="w-full bg-gray-50 flex justify-center items-center min-h-[400px] lg:min-h-[600px] p-6">
                                 {isVideo ? (
                                     <div className="w-full aspect-video rounded-2xl overflow-hidden">
-                                        <VideoPlayer clip={clip} playMode="auto" />
+                                        <VideoPlayer clip={clip} playMode="auto" src={videoSrc} />
                                     </div>
                                 ) : (
                                     <img

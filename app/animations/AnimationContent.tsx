@@ -11,6 +11,7 @@ import Masonry from 'react-masonry-css';
 import { motion } from "framer-motion";
 import { Search, Sparkles, Filter, ArrowRight, ArrowLeft, Star, X } from "lucide-react";
 import { proxyUrl } from "@/lib/proxy";
+import { enqueuePreload } from '@/lib/videoCache';
 
 const MASONRY_BREAKPOINTS = {
     default: 3,
@@ -38,18 +39,24 @@ const CARD_TRANSITION = {
 };
 
 const ClipCard = memo(({ clip }: { clip: SakugabooruPost }) => {
-    if (!clip.file_url) return null;
     const isVideo = ['mp4', 'webm', 'mov', 'mkv'].includes(clip.file_ext);
     const artistName = clip.author || 'Unknown';
     const title = clip.tags?.split(' ').slice(0, 3).join(' ').replace(/_/g, ' ') || "Animation Clip";
     const rawImageUrl = clip.sample_url || clip.preview_url || (!isVideo ? clip.file_url : null);
     const secureImageUrl = rawImageUrl ? proxyUrl(rawImageUrl) : '';
 
+    const handleViewportEnter = useCallback(() => {
+        if (isVideo && clip.file_url) enqueuePreload(clip.id, proxyUrl(clip.file_url));
+    }, [clip.id, clip.file_url, isVideo]);
+
+    if (!clip.file_url) return null;
+
     return (
         <motion.div
             variants={CARD_VARIANTS}
             initial="hidden"
             whileInView="visible"
+            onViewportEnter={handleViewportEnter}
             viewport={{ once: true, margin: "100px" }}
             transition={CARD_TRANSITION}
             className="mb-8"

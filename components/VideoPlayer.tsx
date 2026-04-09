@@ -11,15 +11,15 @@ interface VideoPlayerProps {
     playMode?: 'hover' | 'auto';
     showOverlay?: boolean;
     className?: string;
+    src?: string | undefined;
 }
 
-const VideoPlayer = memo(({ clip, playMode = 'hover', showOverlay = false, className = '' }: VideoPlayerProps) => {
+const VideoPlayer = memo(({ clip, playMode = 'hover', showOverlay = false, className = '', src }: VideoPlayerProps) => {
     const { ref: containerRef, isInView } = useInView<HTMLDivElement>(0.2);
     const videoRef = useRef<HTMLVideoElement>(null);
     const [isHovered, setIsHovered] = useState(false);
     const [isTouchDevice, setIsTouchDevice] = useState(false);
-
-    const secureFileUrl = proxyUrl(clip.file_url);
+    const secureFileUrl = src || proxyUrl(clip.file_url);
     const posterUrl = getPosterUrl(clip);
 
     useEffect(() => {
