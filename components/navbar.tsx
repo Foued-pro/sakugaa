@@ -15,20 +15,22 @@ const navLinks = [
 const menuVariants = {
   closed: {
     opacity: 0,
-    transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] as const }
+    y: -8,
+    transition: { duration: 0.2, ease: [0.22, 1, 0.36, 1] as const }
   },
   open: {
     opacity: 1,
-    transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] as const }
+    y: 0,
+    transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] as const }
   }
 };
 
 const linkVariants = {
-  closed: { opacity: 0, x: -20 },
+  closed: { opacity: 0, y: -6 },
   open: (i: number) => ({
     opacity: 1,
-    x: 0,
-    transition: { delay: 0.1 + i * 0.08, duration: 0.4, ease: [0.22, 1, 0.36, 1] as const }
+    y: 0,
+    transition: { delay: 0.05 + i * 0.05, duration: 0.3, ease: [0.22, 1, 0.36, 1] as const }
   })
 };
 
@@ -45,7 +47,6 @@ export function Navbar() {
   const navBackdrop = useTransform(scrollY, [0, 50], ["blur(0px)", "blur(12px)"])
   const navShadow = useTransform(scrollY, [0, 50], ["none", "0 4px 20px -4px rgba(0,0,0,0.05)"])
 
-  // Lock body scroll when menu is open
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden'
@@ -62,14 +63,13 @@ export function Navbar() {
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] as const }}
             style={{
-              backgroundColor: isOpen ? "rgba(255,255,255,0)" : navBackground,
-              boxShadow: isOpen ? "none" : navShadow,
-              backdropFilter: isOpen ? "none" : navBackdrop
+              backgroundColor: navBackground,
+              boxShadow: navShadow,
+              backdropFilter: navBackdrop
             }}
             className="fixed top-0 left-0 right-0 z-[60] transition-colors duration-300"
         >
           <div className="mx-auto flex max-w-[1500px] items-center justify-between px-6 md:px-12 py-6">
-
             <Link href="/" className="group relative z-10" onClick={() => setIsOpen(false)}>
               <div className="flex items-center gap-2">
                 <motion.span
@@ -77,7 +77,7 @@ export function Navbar() {
                     whileHover={{ rotate: 180, scale: 1.1 }}
                     transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] as const }}
                 />
-                <span className={`text-2xl font-bold tracking-tight transition-colors duration-300 ${isOpen ? 'text-white' : 'text-[#1a1a1a]'}`}>
+                <span className="text-2xl font-bold tracking-tight text-[#1a1a1a]">
                   Sakug<span className="font-serif italic text-[#c4b5fd]">aa</span>
                 </span>
               </div>
@@ -112,7 +112,6 @@ export function Navbar() {
               >
                 <Link href="/login">Log in</Link>
               </Button>
-
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Button className="rounded-full bg-[#1a1a1a] px-8 py-6 text-base text-white hover:bg-black/80 shadow-sm" asChild>
                   <Link href="/login">Join Free</Link>
@@ -122,26 +121,26 @@ export function Navbar() {
 
             {/* Mobile Menu Button */}
             <motion.button
-                className="md:hidden relative z-10 p-2"
+                className="md:hidden relative z-10 w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 border border-gray-200"
                 onClick={() => setIsOpen(!isOpen)}
                 whileTap={{ scale: 0.9 }}
                 aria-label={isOpen ? "Close menu" : "Open menu"}
             >
               <motion.div
                   animate={{ rotate: isOpen ? 90 : 0 }}
-                  transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] as const }}
+                  transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] as const }}
               >
                 {isOpen ? (
-                    <X size={26} className="text-white" />
+                    <X size={18} className="text-[#1a1a1a]" />
                 ) : (
-                    <Menu size={26} className="text-[#1a1a1a]" />
+                    <Menu size={18} className="text-[#1a1a1a]" />
                 )}
               </motion.div>
             </motion.button>
           </div>
         </motion.nav>
 
-        {/* Mobile Fullscreen Menu */}
+        {/* Mobile Menu — white, slide down from top */}
         <AnimatePresence>
           {isOpen && (
               <motion.div
@@ -149,76 +148,58 @@ export function Navbar() {
                   initial="closed"
                   animate="open"
                   exit="closed"
-                  className="fixed inset-0 z-50 md:hidden bg-[#1a1a1a] flex flex-col"
+                  className="fixed top-0 left-0 right-0 z-50 md:hidden bg-white border-b border-gray-100 pt-24 pb-6 px-4"
               >
-                {/* Decorative blob */}
-                <div className="absolute top-[10%] right-[-20%] w-[400px] h-[400px] bg-[#c4b5fd]/10 rounded-full blur-[100px] pointer-events-none" />
-                <div className="absolute bottom-[10%] left-[-10%] w-[300px] h-[300px] bg-[#c4b5fd]/5 rounded-full blur-[80px] pointer-events-none" />
-
-                {/* Nav Links */}
-                <div className="flex-1 flex flex-col justify-center px-8 pt-24">
-                  <div className="space-y-2">
-                    {navLinks.map((link, i) => (
-                        <motion.div
-                            key={link.name}
-                            custom={i}
-                            variants={linkVariants}
-                            initial="closed"
-                            animate="open"
+                {/* Links */}
+                <div className="flex flex-col gap-1 mb-4">
+                  {navLinks.map((link, i) => (
+                      <motion.div
+                          key={link.name}
+                          custom={i}
+                          variants={linkVariants}
+                          initial="closed"
+                          animate="open"
+                      >
+                        <Link
+                            href={link.href}
+                            onClick={() => setIsOpen(false)}
+                            className="group flex items-center justify-between px-4 py-4 rounded-2xl hover:bg-gray-50 transition-colors"
                         >
-                          <Link
-                              href={link.href}
-                              onClick={() => setIsOpen(false)}
-                              className="group flex items-center justify-between py-5 border-b border-white/10"
-                          >
-                            <div>
-                              <span className="text-3xl font-bold text-white group-hover:text-[#c4b5fd] transition-colors">
-                                {link.name}
-                              </span>
-                              <p className="text-sm text-gray-500 mt-1">{link.desc}</p>
-                            </div>
-                            <ArrowRight className="w-5 h-5 text-gray-600 group-hover:text-[#c4b5fd] group-hover:translate-x-1 transition-all" />
-                          </Link>
-                        </motion.div>
-                    ))}
-                  </div>
-
-                  {/* CTA Buttons */}
-                  <motion.div
-                      custom={navLinks.length}
-                      variants={linkVariants}
-                      initial="closed"
-                      animate="open"
-                      className="flex flex-col gap-3 mt-12"
-                  >
-                    <Link
-                        href="/login"
-                        onClick={() => setIsOpen(false)}
-                        className="w-full py-4 rounded-full bg-[#c4b5fd] text-[#1a1a1a] text-center text-lg font-bold hover:bg-[#b4a5ed] transition-colors"
-                    >
-                      Join Free
-                    </Link>
-                    <Link
-                        href="/login"
-                        onClick={() => setIsOpen(false)}
-                        className="w-full py-4 rounded-full border border-white/20 text-white text-center text-lg font-medium hover:border-white/40 transition-colors"
-                    >
-                      Log in
-                    </Link>
-                  </motion.div>
+                          <div>
+                            <span className="text-lg font-bold text-[#1a1a1a] group-hover:text-[#c4b5fd] transition-colors">
+                              {link.name}
+                            </span>
+                            <p className="text-sm text-gray-400 mt-0.5">{link.desc}</p>
+                          </div>
+                          <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-[#c4b5fd] group-hover:translate-x-1 transition-all" />
+                        </Link>
+                      </motion.div>
+                  ))}
                 </div>
 
-                {/* Bottom branding */}
+                {/* CTA */}
                 <motion.div
-                    custom={navLinks.length + 1}
+                    custom={navLinks.length}
                     variants={linkVariants}
                     initial="closed"
                     animate="open"
-                    className="px-8 pb-10"
+                    className="flex flex-col gap-2 px-2"
                 >
-                  <p className="text-xs text-gray-600 tracking-widest uppercase">
-                    The modern sakuga platform
-                  </p>
+                  <div className="h-px bg-gray-100 mb-2" />
+                  <Link
+                      href="/login"
+                      onClick={() => setIsOpen(false)}
+                      className="w-full py-4 rounded-full bg-[#1a1a1a] text-white text-center text-base font-bold hover:bg-black transition-colors"
+                  >
+                    Join Free
+                  </Link>
+                  <Link
+                      href="/login"
+                      onClick={() => setIsOpen(false)}
+                      className="w-full py-4 rounded-full border border-gray-200 text-[#1a1a1a] text-center text-base font-medium hover:border-gray-400 transition-colors"
+                  >
+                    Log in
+                  </Link>
                 </motion.div>
               </motion.div>
           )}
