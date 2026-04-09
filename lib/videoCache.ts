@@ -17,7 +17,10 @@ export function enqueuePreload(clipId: number, url: string) {
     videoCache.set(clipId, '');
     preloadQueue.push(async () => {
         try {
-            await fetch(url);
+            const res = await fetch(url, {
+                headers: { 'Range': 'bytes=0-524287' } // 512 KB
+            });
+            await res.blob();
             videoCache.set(clipId, url);
         } catch {
             videoCache.delete(clipId);
