@@ -89,7 +89,6 @@ const VideoPlayer = memo(({ clip, playMode = 'hover', showOverlay = false, class
                 className="absolute inset-0 w-full h-full object-cover z-0"
             />
 
-            {/* Vidéo montée dès isInView, fade in quand prête */}
             {isInView && (
                 <video
                     ref={videoRef}
