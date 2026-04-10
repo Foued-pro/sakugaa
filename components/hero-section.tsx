@@ -161,7 +161,7 @@ export function HeroSection({ clips = [] }: HeroSectionProps) {
                             className="text-lg text-gray-500 leading-relaxed max-w-md"
                         >
                             Sakugabooru has catalogued exceptional anime animation for years —
-                            the cuts where an animator's hand becomes unmistakable.
+                            the cuts where an animator&apos;s hand becomes unmistakable.
                             The data is excellent. The interface was not. This is the fix.
                         </motion.p>
 

@@ -136,7 +136,7 @@ export function TrendingSection({ clips = [] }: TrendingSectionProps) {
                             Trending Now
                         </span>
                         <h2 className="text-4xl md:text-5xl font-bold mt-3 text-[#1a1a1a] leading-tight tracking-tight">
-                            This week's
+                            This week&apos;s
                             <br />
                             <span className="font-serif italic font-medium text-gray-300">top clips.</span>
                         </h2>

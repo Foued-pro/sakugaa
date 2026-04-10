@@ -3,27 +3,26 @@ export function WhatIsSakuga() {
         <section className="py-24 bg-[#fafafa] border-t border-gray-100">
             <div className="max-w-[1500px] mx-auto px-6 md:px-12">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-
                     {/* LEFT */}
                     <div>
-                        <span className="text-xs font-bold uppercase tracking-widest text-[#c4b5fd]">
-                            C'est quoi la sakuga ?
-                        </span>
+    <span className="text-xs font-bold uppercase tracking-widest text-[#c4b5fd]">
+        What is sakuga?
+    </span>
                         <h2 className="text-4xl md:text-5xl font-bold text-[#1a1a1a] mt-4 leading-tight">
-                            Les secondes où
+                            The seconds where
                             <br />
                             <span className="font-serif italic font-medium text-[#c4b5fd]">
-                                l'animation devient l'histoire.
-                            </span>
+            animation becomes the point.
+        </span>
                         </h2>
                         <p className="text-gray-500 mt-6 leading-relaxed">
-                            作画 (sakuga) désigne les séquences d'animation exceptionnelles dans l'anime — les moments où la qualité visuelle atteint son pic, souvent liés à un animateur précis dont le style devient reconnaissable au premier regard.
+                            Sakuga (作画) refers to exceptional animation sequences in anime — the moments where visual quality peaks, often tied to a specific animator whose style becomes unmistakable at first glance.
                         </p>
                         <p className="text-gray-500 mt-4 leading-relaxed">
-                            Yutaka Nakamura pour ses impact frames, Hiroyuki Imaishi pour son énergie débridée, Megumi Ishitani pour sa composition — chaque cut sakuga porte une signature.
+                            Yutaka Nakamura for his impact frames, Hiroyuki Imaishi for his relentless energy, Megumi Ishitani for her compositions — every sakuga cut carries a signature.
                         </p>
                         <p className="text-gray-500 mt-4 leading-relaxed">
-                            Sakugabooru archive ces moments depuis des années. Sakugaa leur donne enfin l'interface qu'ils méritent.
+                            Sakugabooru has archived these moments for years. Sakugaa gives them the interface they deserve.
                         </p>
                     </div>
 
