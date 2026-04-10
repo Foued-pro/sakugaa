@@ -3,6 +3,7 @@
 import { HeroSection } from "@/components/hero-section";
 import { TrendingSection } from "@/components/trending-section";
 import { FeaturedAnimators } from "@/components/featured-animators";
+import { WhatIsSakuga } from "@/components/what-is-sakuga";
 
 interface HomeClientProps {
     heroClips: any[];
